@@ -30,6 +30,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     },
   ];
 
+  // Матрица grayscale
+  final ColorFilter _grayscaleFilter = ColorFilter.matrix(<double>[
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0, 0, 0, 1, 0,
+  ]);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,11 +55,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(33.05),
-                      child: Image.asset(
-                        _data[i]['image']!,
-                        width: 336,
-                        height: 438.45,
-                        fit: BoxFit.cover,
+                      child: ColorFiltered(
+                        colorFilter: _grayscaleFilter,
+                        child: Image.asset(
+                          _data[i]['image']!,
+                          width: 336,
+                          height: 438.45,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     SizedBox(height: 40),
