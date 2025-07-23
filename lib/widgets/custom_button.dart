@@ -3,10 +3,15 @@ import '../theme/colors.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isOutlined;
 
-  const CustomButton({required this.text, required this.onPressed, this.isOutlined = false});
+  const CustomButton({
+    required this.text,
+    this.onPressed,
+    this.isOutlined = false,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +23,10 @@ class CustomButton extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: AppColors.primary),
               ),
-              child: Text(text, style: TextStyle(color: AppColors.primary)),
+              child: Text(
+                text,
+                style: TextStyle(color: AppColors.primary),
+              ),
             )
           : ElevatedButton(
               onPressed: onPressed,
