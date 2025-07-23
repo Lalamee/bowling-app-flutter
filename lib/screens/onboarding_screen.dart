@@ -15,98 +15,222 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<Map<String, String>> _data = [
     {
       'image': 'assets/images/onboard1.jpg',
-      'title': 'Проектирование и установка дорожек',
-      'subtitle': 'Мы создаем профессиональные решения под ключ.',
+      'title': 'Модернизация и обновление оборудования',
+      'subtitle': 'от Brunswick и QubicaAMF',
     },
     {
       'image': 'assets/images/onboard2.jpg',
       'title': 'Модернизация оборудования',
-      'subtitle': 'Помогаем обновить ваши дорожки и систему.',
+      'subtitle': 'чтобы ваш бизнес оставался в авангарде технологических инноваций',
     },
     {
       'image': 'assets/images/onboard3.jpg',
-      'title': 'Обучение и техподдержка',
-      'subtitle': 'Мы обучим и поддержим ваш персонал.',
+      'title': 'Обучение и техническая поддержка ',
+      'subtitle': 'наши квалифицированные специалисты всегда готовы прийти на помощь',
     },
   ];
 
-  // Матрица grayscale
-  final ColorFilter _grayscaleFilter = ColorFilter.matrix(<double>[
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0, 0, 0, 1, 0,
-  ]);
+  void _skip() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => WelcomeScreen()),
+    );
+  }
+
+  Widget _buildIndicator() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(_data.length, (i) {
+        final isActive = i == _index;
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 6),
+          padding: isActive ? const EdgeInsets.all(3) : EdgeInsets.zero,
+          decoration: isActive
+              ? BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.grey.shade300, // рамка вокруг активной точки
+                    width: 2,
+                  ),
+                )
+              : null,
+          child: Container(
+            width: 12,
+            height: 12,
+            decoration: BoxDecoration(
+              color: isActive ? AppColors.primary : AppColors.darkGray,
+              shape: BoxShape.circle,
+            ),
+          ),
+        );
+      }),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final screen = MediaQuery.of(context).size;
+
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: PageView.builder(
-              controller: _controller,
-              itemCount: _data.length,
-              onPageChanged: (i) => setState(() => _index = i),
-              itemBuilder: (_, i) => Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Кнопка "Пропустить"
+            Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 20, top: 10),
+                child: TextButton(
+                  onPressed: _skip,
+                  child: const Text(
+                    'Пропустить',
+                    style: TextStyle(
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                      color: Color(0xFFD7D7D7),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // PageView
+            Expanded(
+              child: PageView.builder(
+                controller: _controller,
+                itemCount: _data.length,
+                onPageChanged: (i) => setState(() => _index = i),
+                itemBuilder: (_, i) {
+                  return SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Column(
+                        children: [
+                          // Картинка с ч/б фильтром
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(33.05),
+                            child: ColorFiltered(
+                              colorFilter: const ColorFilter.matrix(<double>[
+                                0.2126, 0.7152, 0.0722, 0, 0,
+                                0.2126, 0.7152, 0.0722, 0, 0,
+                                0.2126, 0.7152, 0.0722, 0, 0,
+                                0,      0,      0,      1, 0,
+                              ]),
+                              child: Image.asset(
+                                _data[i]['image']!,
+                                width: 336,
+                                height: 438.45,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+                          _buildIndicator(),
+
+                          // Текстовая часть
+                          Padding(
+                            padding: const EdgeInsets.only(top: 24), // ← отступ текста от картинки
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: screen.width * 0.9,
+                                  child: Text(
+                                    _data[i]['title']!,
+                                    textAlign: TextAlign.center,
+                                    style: AppTextStyles.onboardingTitle,
+                                    softWrap: true,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Container(
+                                  width: screen.width * 0.95,
+                                  child: Text(
+                                    _data[i]['subtitle']!,
+                                    textAlign: TextAlign.center,
+                                    style: AppTextStyles.onboardingSubtitle,
+                                    softWrap: true, // ← убираем обрезку, разрешаем перенос
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // Кнопки навигации (стрелки)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 24),
+              child: Container(
+                width: 120,
+                height: 48,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFCFCFD),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x1F0F0F0F),
+                      offset: Offset(0, 40),
+                      blurRadius: 32,
+                      spreadRadius: -24,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(33.05),
-                      child: ColorFiltered(
-                        colorFilter: _grayscaleFilter,
-                        child: Image.asset(
-                          _data[i]['image']!,
-                          width: 336,
-                          height: 438.45,
-                          fit: BoxFit.cover,
+                    GestureDetector(
+                      onTap: _index > 0
+                          ? () {
+                              _controller.previousPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                          : null,
+                      child: Opacity(
+                        opacity: _index > 0 ? 1.0 : 0.3,
+                        child: Icon(
+                          Icons.arrow_back_ios_new,
+                          color: AppColors.textDark,
+                          size: 20,
                         ),
                       ),
                     ),
-                    SizedBox(height: 40),
-                    SizedBox(
-                      width: 330,
-                      height: 70,
-                      child: Text(
-                        _data[i]['title']!,
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.onboardingTitle,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    SizedBox(
-                      width: 355,
-                      height: 60,
-                      child: Text(
-                        _data[i]['subtitle']!,
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.onboardingSubtitle,
+                    GestureDetector(
+                      onTap: () {
+                        if (_index < _data.length - 1) {
+                          _controller.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        } else {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => WelcomeScreen()),
+                          );
+                        }
+                      },
+                      child: Icon(
+                        Icons.arrow_forward_ios,
+                        color: AppColors.textDark,
+                        size: 20,
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: ElevatedButton(
-              onPressed: () {
-                if (_index < _data.length - 1) {
-                  _controller.nextPage(duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
-                } else {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => WelcomeScreen()));
-                }
-              },
-              child: Text(_index < _data.length - 1 ? 'Далее' : 'Начать'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
