@@ -25,7 +25,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     },
     {
       'image': 'assets/images/onboard3.jpg',
-      'title': 'Обучение и техническая поддержка ',
+      'title': 'Обучение и техническая поддержка',
       'subtitle': 'наши квалифицированные специалисты всегда готовы прийти на помощь',
     },
   ];
@@ -49,7 +49,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ? BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.grey.shade300, // рамка вокруг активной точки
+                    color: AppColors.primary, // бордовая рамка вокруг активной точки
                     width: 2,
                   ),
                 )
@@ -130,9 +130,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           const SizedBox(height: 16),
                           _buildIndicator(),
 
-                          // Текстовая часть
+                          // Заголовок и подзаголовок
                           Padding(
-                            padding: const EdgeInsets.only(top: 24), // ← отступ текста от картинки
+                            padding: const EdgeInsets.only(top: 24),
                             child: Column(
                               children: [
                                 Container(
@@ -151,7 +151,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     _data[i]['subtitle']!,
                                     textAlign: TextAlign.center,
                                     style: AppTextStyles.onboardingSubtitle,
-                                    softWrap: true, // ← убираем обрезку, разрешаем перенос
+                                    softWrap: true,
                                   ),
                                 ),
                               ],
@@ -169,7 +169,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Container(
-                width: 120,
+                width: 120, // размер всей панели с кнопками
                 height: 48,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
