@@ -19,4 +19,21 @@ class AppTextStyles {
     letterSpacing: -0.02 * 20,
     color: AppColors.textDark,
   );
+
+  static const TextStyle formLabel = TextStyle(
+    fontFamily: 'Roboto',
+    fontWeight: FontWeight.w500,
+    fontSize: 10,
+    height: 1.0,
+    letterSpacing: -0.2,
+    color: AppColors.darkGray,
+  );
+
+  static const TextStyle formHint = TextStyle(
+    color: Colors.grey,
+  );
+
+  static const TextStyle formInput = TextStyle(
+    color: AppColors.textDark,
+  );
 }

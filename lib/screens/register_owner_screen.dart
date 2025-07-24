@@ -1,133 +1,77 @@
 import 'package:flutter/material.dart';
+import '../theme/colors.dart';
+import '../theme/text_styles.dart';
+import '../widgets/labeled_text_field.dart';
+import '../widgets/radio_group.dart';
+import '../widgets/custom_button.dart';
 
 class RegisterOwnerScreen extends StatefulWidget {
-  const RegisterOwnerScreen({super.key});
-
+  const RegisterOwnerScreen({Key? key}) : super(key: key);
   @override
   State<RegisterOwnerScreen> createState() => _RegisterOwnerScreenState();
 }
 
 class _RegisterOwnerScreenState extends State<RegisterOwnerScreen> {
-  String? _status;
+  final _formKey = GlobalKey<FormState>();
+  final _inn = TextEditingController();
+  final _club = TextEditingController();
+  final _addr = TextEditingController();
+  final _lanes = TextEditingController();
+  final _equip = TextEditingController();
+  final _skills = TextEditingController();
+  String? status;
 
   @override
-  Widget build(BuildContext context) {
+  void dispose() {
+    [_inn, _club, _addr, _lanes, _equip, _skills].forEach((c) => c.dispose());
+    super.dispose();
+  }
+
+  String? _validateNotEmpty(String? v) =>
+      (v == null || v.trim().isEmpty) ? 'Обязательно заполните' : null;
+
+  String? _validateInteger(String? v) {
+    if (v == null || v.trim().isEmpty) return 'Поле обязательно';
+    return int.tryParse(v) != null ? null : 'Укажите целое число';
+  }
+
+  void _submit() {
+    if (!_formKey.currentState!.validate() || status == null) {
+      if (status == null)
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Выберите статус')));
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Регистрация владельца выполнена')));
+  }
+
+  @override
+  Widget build(BuildContext ctx) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back),
-              ),
-              const Text(
-                'Добро пожаловать!',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFB2002D)),
-              ),
+          child: Form(
+            key: _formKey,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.arrow_back)),
+              Text('Добро пожаловать!', style: AppTextStyles.onboardingTitle.copyWith(color: AppColors.primary)),
               const SizedBox(height: 8),
-              const Text(
-                'Пожалуйста, заполните короткую форму — это нужно, чтобы мы знали, в каком клубе вы работаете и могли подключить вас к системе для заказов и обслуживания оборудования.',
-              ),
+              const Text('Короткая регистрационная форма'),
               const SizedBox(height: 24),
-              _labeledInput('ИНН'),
-              _labeledInput('Название клуба'),
-              _labeledInput('Адрес'),
-              _labeledInput('Количество дорожек'),
-              _labeledInput('AMF, Brunswick, VIA, XIMA либо другое'),
-              _labeledInput('Ваша специализация, навыки, преимущества:'),
+              LabeledTextField(label: 'ИНН', controller: _inn, validator: _validateNotEmpty, keyboardType: TextInputType.number),
+              LabeledTextField(label: 'Название клуба', controller: _club, validator: _validateNotEmpty),
+              LabeledTextField(label: 'Адрес', controller: _addr, validator: _validateNotEmpty),
+              LabeledTextField(label: 'Количество дорожек', controller: _lanes, validator: _validateInteger, keyboardType: TextInputType.number),
+              LabeledTextField(label: 'Оборудование', controller: _equip, validator: _validateNotEmpty),
+              LabeledTextField(label: 'Навыки', controller: _skills, validator: _validateNotEmpty),
               const SizedBox(height: 16),
-              const Text('Ваш статус:',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  )),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  _radioOption('ИП'),
-                  _radioOption('Самозанятый'),
-                ],
-              ),
+              const Text('Статус', style: AppTextStyles.formLabel),
+              RadioGroup(options: const ['ИП', 'Самозанятый'], groupValue: status, onChanged: (v) => setState(() => status = v)),
               const SizedBox(height: 24),
-              _submitButton(),
-            ],
+              CustomButton(text: 'Зарегистрироваться', onPressed: _submit),
+            ]),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _labeledInput(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFFC2C3CB),
-              fontFamily: 'Roboto',
-              fontWeight: FontWeight.w500,
-              fontSize: 10,
-              height: 1.0,
-              letterSpacing: -0.2,
-            ),
-          ),
-          const SizedBox(height: 4),
-          TextField(
-            decoration: InputDecoration(
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _radioOption(String label) {
-    return Expanded(
-      child: Row(
-        children: [
-          Radio<String>(
-            value: label,
-            groupValue: _status,
-            onChanged: (value) {
-              setState(() {
-                _status = value;
-              });
-            },
-          ),
-          Text(label),
-        ],
-      ),
-    );
-  }
-
-  Widget _submitButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 48,
-      child: ElevatedButton(
-        onPressed: () {
-          // TODO: обработка регистрации
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.grey[700],
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-        child: const Text(
-          'Зарегистрироваться',
-          style: TextStyle(color: Colors.white),
         ),
       ),
     );
