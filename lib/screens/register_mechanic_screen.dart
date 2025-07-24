@@ -119,16 +119,20 @@ class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
                 setState(() => birthDate = picked);
               }
             },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade400),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                birthDate != null
-                    ? DateFormat('dd / MM / yyyy').format(birthDate!)
-                    : 'ДД / ММ / ГГГГ',
+            child: AbsorbPointer(
+              child: TextField(
+                controller: TextEditingController(
+                  text: birthDate != null ? DateFormat('dd / MM / yyyy').format(birthDate!) : '',
+                ),
+                readOnly: true,
+                decoration: InputDecoration(
+                  hintText: 'ДД / ММ / ГГГГ',
+                  hintStyle: TextStyle(color: Colors.grey[600]),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                ),
                 style: TextStyle(
                   color: birthDate != null ? Colors.black : Colors.grey[600],
                 ),

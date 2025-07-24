@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
-class RegisterOwnerScreen extends StatelessWidget {
+class RegisterOwnerScreen extends StatefulWidget {
   const RegisterOwnerScreen({super.key});
+
+  @override
+  State<RegisterOwnerScreen> createState() => _RegisterOwnerScreenState();
+}
+
+class _RegisterOwnerScreenState extends State<RegisterOwnerScreen> {
+  String? _status;
 
   @override
   Widget build(BuildContext context) {
@@ -13,10 +20,16 @@ class RegisterOwnerScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back)),
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.arrow_back),
+              ),
               const Text(
                 'Добро пожаловать!',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFB2002D)),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFB2002D)),
               ),
               const SizedBox(height: 8),
               const Text(
@@ -30,7 +43,12 @@ class RegisterOwnerScreen extends StatelessWidget {
               _labeledInput('AMF, Brunswick, VIA, XIMA либо другое'),
               _labeledInput('Ваша специализация, навыки, преимущества:'),
               const SizedBox(height: 16),
-              const Text('Ваш статус:', style: TextStyle(fontWeight: FontWeight.w500)),
+              const Text('Ваш статус:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  )),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   _radioOption('ИП'),
@@ -55,19 +73,19 @@ class RegisterOwnerScreen extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
+              color: Color(0xFFC2C3CB),
               fontFamily: 'Roboto',
               fontWeight: FontWeight.w500,
               fontSize: 10,
               height: 1.0,
               letterSpacing: -0.2,
-              color: Color(0xFFC2C3CB),
             ),
           ),
           const SizedBox(height: 4),
           TextField(
             decoration: InputDecoration(
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             ),
           ),
         ],
@@ -79,7 +97,15 @@ class RegisterOwnerScreen extends StatelessWidget {
     return Expanded(
       child: Row(
         children: [
-          Radio(value: label, groupValue: null, onChanged: (_) {}),
+          Radio<String>(
+            value: label,
+            groupValue: _status,
+            onChanged: (value) {
+              setState(() {
+                _status = value;
+              });
+            },
+          ),
           Text(label),
         ],
       ),
@@ -91,12 +117,18 @@ class RegisterOwnerScreen extends StatelessWidget {
       width: double.infinity,
       height: 48,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          // TODO: обработка регистрации
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.grey[700],
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
-        child: const Text('Зарегистрироваться'),
+        child: const Text(
+          'Зарегистрироваться',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
     );
   }
