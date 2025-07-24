@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'register_step1.dart';
+import 'register_role_selection.dart';
 
 class WelcomeScreen extends StatelessWidget {
   @override
@@ -18,7 +18,7 @@ class WelcomeScreen extends StatelessWidget {
               style: ElevatedButton.styleFrom(minimumSize: Size.fromHeight(50)),
             ),
             TextButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => RegisterStep1())),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => RegisterRoleSelectionScreen())),
               child: Text('Зарегистрироваться'),
             )
           ],
