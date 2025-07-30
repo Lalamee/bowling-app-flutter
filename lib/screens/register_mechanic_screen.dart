@@ -32,13 +32,14 @@ class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
     super.dispose();
   }
 
-  void _pickBirthDate() async {
+  Future<void> _pickBirthDate() async {
     final now = DateTime.now();
     final picked = await showDatePicker(
-        context: context,
-        initialDate: birthDate ?? DateTime(now.year - 18),
-        firstDate: DateTime(1900),
-        lastDate: now);
+      context: context,
+      initialDate: birthDate ?? DateTime(now.year - 18),
+      firstDate: DateTime(1900),
+      lastDate: now,
+    );
     if (picked != null) {
       birthDate = picked;
       _birth.text = DateFormat('dd / MM / yyyy').format(picked);
@@ -58,15 +59,20 @@ class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
 
   void _submit() {
     if (!_formKey.currentState!.validate() || status == null) {
-      if (status == null)
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Выберите статус')));
+      if (status == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Выберите статус')),
+        );
+      }
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Регистрация механика выполнена')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Регистрация механика выполнена')),
+    );
   }
 
   @override
-  Widget build(BuildContext ctx) {
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -74,26 +80,64 @@ class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
           padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.arrow_back)),
-              Text('Добро пожаловать!', style: AppTextStyles.onboardingTitle.copyWith(color: AppColors.primary)),
-              const SizedBox(height: 8),
-              const Text('Короткая регистрационная форма'),
-              const SizedBox(height: 24),
-              LabeledTextField(label: 'ФИО', controller: _fio, validator: _validateNotEmpty),
-              GestureDetector(onTap: _pickBirthDate, child: AbsorbPointer(child:
-                LabeledTextField(label: 'Дата рождения', controller: _birth, validator: _validateBirth, readOnly: true))),
-              LabeledTextField(label: 'Номер телефона', controller: _phone, validator: _validatePhone, keyboardType: TextInputType.phone),
-              LabeledTextField(label: 'Клуб(ы)', controller: _clubs, validator: _validateNotEmpty),
-              LabeledTextField(label: 'Роботы', controller: _robots, validator: _validateNotEmpty),
-              LabeledTextField(label: 'Период работы', controller: _period, validator: _validateNotEmpty),
-              LabeledTextField(label: 'Навыки', controller: _skills, validator: _validateNotEmpty),
-              const SizedBox(height: 16),
-              const Text('Статус', style: AppTextStyles.formLabel),
-              RadioGroup(options: const ['ИП', 'Самозанятый'], groupValue: status, onChanged: (v) => setState(() => status = v)),
-              const SizedBox(height: 24),
-              CustomButton(text: 'Зарегистрироваться', onPressed: _submit),
-            ]),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.arrow_back),
+                ),
+                Text(
+                  'Добро пожаловать!',
+                  style: AppTextStyles.onboardingTitle.copyWith(color: AppColors.primary),
+                ),
+                const SizedBox(height: 8),
+                const Text('Короткая регистрационная форма'),
+                const SizedBox(height: 24),
+                LabeledTextField(
+                  label: 'ФИО', 
+                  controller: _fio, 
+                  validator: _validateNotEmpty),
+                LabeledTextField(
+                  label: 'Дата рождения',
+                  controller: _birth,
+                  validator: _validateBirth,
+                  readOnly: true,
+                  onTap: _pickBirthDate,
+                ),
+                LabeledTextField(
+                  label: 'Номер телефона',
+                  controller: _phone,
+                  validator: _validatePhone,
+                  keyboardType: TextInputType.phone,
+                ),
+                LabeledTextField(
+                  label: 'Клуб(ы)', 
+                  controller: _clubs, 
+                  validator: _validateNotEmpty),
+                LabeledTextField(
+                  label: 'Роботы', 
+                  controller: _robots, 
+                  validator: _validateNotEmpty),
+                LabeledTextField(
+                  label: 'Период работы', 
+                  controller: _period, 
+                  validator: _validateNotEmpty),
+                LabeledTextField(
+                  label: 'Навыки', 
+                  controller: _skills, 
+                  validator: _validateNotEmpty),
+                const SizedBox(height: 16),
+                const Text('Статус', style: AppTextStyles.formLabel),
+                RadioGroup(
+                  options: const ['ИП', 'Самозанятый'],
+                  groupValue: status,
+                  onChanged: (v) => setState(() => status = v),
+                ),
+                const SizedBox(height: 24),
+                Center(child: CustomButton(text: 'Зарегистрироваться', onPressed: _submit)),
+              ],
+            ),
           ),
         ),
       ),
