@@ -14,18 +14,50 @@ class RadioGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
       children: options.map((label) {
-        return Expanded(
+        final isSelected = label == groupValue;
+        return GestureDetector(
+          onTap: () => onChanged(label),
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Radio<String>(
-                value: label,
-                groupValue: groupValue,
-                onChanged: onChanged,
-                activeColor: const Color(0xFF8A002D), // AppColors.primary
+              Container(
+                width: 12,
+                height: 12,
+                margin: const EdgeInsets.only(right: 8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isSelected ? const Color(0xFF8A002D) : Colors.grey,
+                    width: 2,
+                  ),
+                  color: isSelected ? const Color(0xFF8A002D) : Colors.transparent,
+                ),
               ),
-              Text(label),
+              Container(
+                height: 29,
+                constraints: const BoxConstraints(minWidth: 75),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isSelected ? const Color(0xFF8A002D) : Colors.grey.shade400,
+                  ),
+                ),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: isSelected ? const Color(0xFF8A002D) : Colors.grey[700],
+                  ),
+                ),
+              ),
             ],
           ),
         );
@@ -33,3 +65,4 @@ class RadioGroup extends StatelessWidget {
     );
   }
 }
+

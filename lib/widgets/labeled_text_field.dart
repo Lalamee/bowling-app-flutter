@@ -9,6 +9,7 @@ class LabeledTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final bool readOnly;
   final VoidCallback? onTap;
+  final IconData? icon;
 
   const LabeledTextField({
     Key? key,
@@ -18,28 +19,34 @@ class LabeledTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.readOnly = false,
     this.onTap,
+    this.icon,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label, style: AppTextStyles.formLabel),
-        const SizedBox(height: 4),
-        TextFormField(
+      child: SizedBox(
+        width: 344,
+        height: 50,
+        child: TextFormField(
           controller: controller,
           validator: validator,
           keyboardType: keyboardType,
           readOnly: readOnly,
           onTap: onTap,
           decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            hintText: label,
+            hintStyle: AppTextStyles.formLabel,
+            prefixIcon: icon != null ? Icon(icon, size: 20, color: AppColors.primary) : null,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.84),
+            ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           ),
           style: AppTextStyles.formInput,
         ),
-      ]),
+      ),
     );
   }
 }
