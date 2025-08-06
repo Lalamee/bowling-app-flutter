@@ -36,4 +36,22 @@ class AppTextStyles {
   static const TextStyle formInput = TextStyle(
     color: AppColors.textDark,
   );
+
+  static const TextStyle mainWelcomeTitle = TextStyle(
+    fontFamily: 'Roboto',
+    fontWeight: FontWeight.w700,
+    fontSize: 32,
+    height: 1.25,
+    letterSpacing: -0.04,
+    color: AppColors.primary,
+  );
+
+  static const TextStyle sectionTitle = TextStyle(
+    fontFamily: 'Roboto',
+    fontWeight: FontWeight.w500,
+    fontSize: 20,
+    height: 1.0,
+    letterSpacing: -0.02,
+    color: AppColors.darkGray,
+  );
 }

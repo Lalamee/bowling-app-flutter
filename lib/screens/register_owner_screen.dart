@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
 import '../theme/colors.dart';
 import '../theme/text_styles.dart';
 import '../widgets/labeled_text_field.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/radio_group_wrap.dart';
+import '../utils/validators.dart';
+import '../utils/form_navigation.dart';
+import '../widgets/common_ui.dart';
 import '../widgets/radio_group_horizontal.dart';
 import '../widgets/radio_group_vertical.dart';
-import '../widgets/custom_button.dart';
 
 class RegisterOwnerScreen extends StatefulWidget {
   const RegisterOwnerScreen({Key? key}) : super(key: key);
@@ -12,8 +18,7 @@ class RegisterOwnerScreen extends StatefulWidget {
   State<RegisterOwnerScreen> createState() => _RegisterOwnerScreenState();
 }
 
-class _RegisterOwnerScreenState extends State<RegisterOwnerScreen> {
-  final _formKey = GlobalKey<FormState>();
+class _RegisterOwnerScreenState extends MultiStepFormState<RegisterOwnerScreen> {
   final _inn = TextEditingController();
   final _club = TextEditingController();
   final _addr = TextEditingController();
@@ -24,7 +29,6 @@ class _RegisterOwnerScreenState extends State<RegisterOwnerScreen> {
   final _customEquipment = TextEditingController();
   String? status;
   String? selectedEquipment;
-  int _step = 0;
 
   final List<String> _equipmentOptions = ['AMF', 'Brunswick', 'VIA', 'XIMA', 'другое'];
 
@@ -34,14 +38,8 @@ class _RegisterOwnerScreenState extends State<RegisterOwnerScreen> {
     super.dispose();
   }
 
-  String? _validateNotEmpty(String? v) => (v == null || v.trim().isEmpty) ? 'Обязательно заполните' : null;
-  String? _validateInteger(String? v) {
-    if (v == null || v.trim().isEmpty) return 'Поле обязательно';
-    return int.tryParse(v) != null ? null : 'Укажите целое число';
-  }
-
   void _submit() {
-    if (!_formKey.currentState!.validate() || status == null || selectedEquipment == null) {
+    if (!formKey.currentState!.validate() || status == null || selectedEquipment == null) {
       if (status == null) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Выберите статус')));
       }
@@ -53,32 +51,31 @@ class _RegisterOwnerScreenState extends State<RegisterOwnerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Регистрация владельца выполнена')));
   }
 
-  void _nextStep() {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _step++);
-    }
-  }
-
-  void _prevStep() {
-    setState(() => _step--);
-  }
-
   @override
   Widget build(BuildContext ctx) {
-    final pages = [
-      _buildStepOne(ctx),
-      _buildStepTwo(ctx),
-    ];
+    final steps = [_buildStepOne(ctx), _buildStepTwo(ctx)];
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: pages[_step],
-          ),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Form(
+                  key: formKey,
+                  child: steps[step],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: step == 1
+                  ? CustomButton(text: 'Зарегистрироваться', onPressed: _submit)
+                  : CustomButton(text: 'Далее', onPressed: nextStep),
+            ),
+          ],
         ),
       ),
     );
@@ -89,43 +86,38 @@ class _RegisterOwnerScreenState extends State<RegisterOwnerScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.arrow_back)),
-        Text('Добро пожаловать!', style: AppTextStyles.onboardingTitle.copyWith(color: AppColors.primary)),
-        const SizedBox(height: 8),
-        const Text('Это нужно, чтобы мы знали, каким клубом вы управляете, и могли предоставить вам доступ к инструментам управления, заказам и аналитике.'),
-        const SizedBox(height: 24),
+        formStepTitle('Добро пожаловать!'),
+        formDescription(
+          'Это нужно, чтобы мы знали, каким клубом вы управляете, и могли предоставить вам доступ к инструментам управления, заказам и аналитике.',
+        ),
         LabeledTextField(
           label: 'ФИО', 
           controller: _fio, 
-          validator: _validateNotEmpty, 
+          validator: Validators.notEmpty, 
           icon: Icons.person),
         LabeledTextField(
           label: 'Номер телефона', 
           controller: _phone, 
-          validator: _validateNotEmpty, 
+          validator: Validators.phone, 
           keyboardType: TextInputType.phone, 
           icon: Icons.phone),
         LabeledTextField(
           label: 'ИНН организации', 
           controller: _inn, 
-          validator: _validateNotEmpty, 
+          validator: Validators.notEmpty, 
           keyboardType: TextInputType.number, 
           icon: Icons.badge),
         LabeledTextField(
           label: 'Адрес клуба', 
           controller: _addr, 
-          validator: _validateNotEmpty, 
+          validator: Validators.notEmpty, 
           icon: Icons.location_on),
-        const Text('Ваш статус:', style: AppTextStyles.formLabel),
+        const SizedBox(height: 16),
+        formDescription('Ваш статус:'),
         RadioGroupHorizontal(
           options: const ['ИП', 'Самозанятый'],
           groupValue: status,
           onChanged: (v) => setState(() => status = v),
-        ),
-        const SizedBox(height: 52),
-        SizedBox(
-          width: double.infinity,
-          height: 65,
-          child: CustomButton(text: 'Далее', onPressed: _nextStep),
         ),
       ],
     );
@@ -135,23 +127,13 @@ class _RegisterOwnerScreenState extends State<RegisterOwnerScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        IconButton(onPressed: _prevStep, icon: const Icon(Icons.arrow_back)),
-        const Text('Расскажите о Вашем клубе:', style: AppTextStyles.onboardingTitle),
-        const SizedBox(height: 8),
-        const Text('Укажите количество дорожек и установленное оборудование — это нужно, чтобы мы могли точно учитывать особенности вашего клуба, подбирая подходящие сервисные решения, а также быстрее обрабатывать заявки на обслуживание.'),
-        const SizedBox(height: 24),
-        LabeledTextField(
-          label: 'Название клуба', 
-          controller: _club, 
-          validator: _validateNotEmpty, 
-          icon: Icons.sports),
-        LabeledTextField(
-          label: 'Количество дорожек', 
-          controller: _lanes, 
-          validator: _validateInteger, 
-          keyboardType: TextInputType.number, 
-          icon: Icons.format_list_numbered),
-        const Text('Какое оборудование стоит в клубе', style: AppTextStyles.formLabel),
+        IconButton(onPressed: prevStep, icon: const Icon(Icons.arrow_back)),
+        sectionTitle('Расскажите о Вашем клубе:'),
+        formDescription('Укажите количество дорожек и установленное оборудование — это нужно, чтобы мы могли точно учитывать особенности вашего клуба.'),
+        LabeledTextField(label: 'Название клуба', controller: _club, validator: Validators.notEmpty, icon: Icons.sports),
+        LabeledTextField(label: 'Количество дорожек', controller: _lanes, validator: Validators.integer, keyboardType: TextInputType.number, icon: Icons.format_list_numbered),
+        const SizedBox(height: 16),
+        sectionTitle('Какое оборудование стоит в клубе'),
         RadioGroupVertical(
           options: _equipmentOptions,
           groupValue: selectedEquipment,
@@ -160,14 +142,8 @@ class _RegisterOwnerScreenState extends State<RegisterOwnerScreen> {
         if (selectedEquipment == 'другое')
           Padding(
             padding: const EdgeInsets.only(top: 12),
-            child: LabeledTextField(label: 'Уточните', controller: _customEquipment, validator: _validateNotEmpty),
+            child: LabeledTextField(label: 'Уточните', controller: _customEquipment, validator: Validators.notEmpty),
           ),
-        const SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          height: 65,
-          child: CustomButton(text: 'Зарегистрироваться', onPressed: _submit),
-        ),
       ],
     );
   }

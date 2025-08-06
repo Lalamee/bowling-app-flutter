@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter/services.dart';
+
 import '../theme/colors.dart';
 import '../theme/text_styles.dart';
 import '../widgets/labeled_text_field.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/radio_group_wrap.dart';
+import '../utils/validators.dart';
+import '../utils/form_navigation.dart';
+import '../widgets/common_ui.dart';
+import '../widgets/radio_group_horizontal.dart';
 
 class RegisterMechanicScreen extends StatefulWidget {
   const RegisterMechanicScreen({Key? key}) : super(key: key);
@@ -14,27 +18,23 @@ class RegisterMechanicScreen extends StatefulWidget {
   State<RegisterMechanicScreen> createState() => _RegisterMechanicScreenState();
 }
 
-class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
-  final _formKey = GlobalKey<FormState>();
-  int _step = 0;
-
-  // Step 1
+class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicScreen> {
   final _fio = TextEditingController();
   final _birth = TextEditingController();
   final _phone = TextEditingController();
   DateTime? birthDate;
 
-  // Step 2
-  String? educationLevel;
   final _educationName = TextEditingController();
   final _extraEducation = TextEditingController();
 
-  // Step 3
   final _workYears = TextEditingController();
   final _bowlingYears = TextEditingController();
   final _currentClub = TextEditingController();
   final _bowlingHistory = TextEditingController();
   final _skills = TextEditingController();
+
+  String? educationLevel;
+  String? status;
 
   @override
   void dispose() {
@@ -69,38 +69,13 @@ class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
     }
   }
 
-  String? _validateNotEmpty(String? v) => (v == null || v.trim().isEmpty) ? 'Обязательно заполните' : null;
-
-  String? _validateBirth(String? v) => birthDate == null ? 'Выберите дату' : null;
-
-  String? _validatePhone(String? v) {
-    if (v == null || v.trim().isEmpty) return 'Введите номер телефона';
-    final digits = v.replaceAll(RegExp(r'\D'), '');
-    if (digits.length != 11) return 'Неверный формат номера';
-    return null;
-  }
-
-  String? _validateInteger(String? v) {
-    if (v == null || v.trim().isEmpty) return 'Обязательно заполните';
-    return int.tryParse(v.trim()) != null ? null : 'Укажите целое число';
-  }
-
-  void _nextStep() {
-    if (_formKey.currentState!.validate()) {
-      if (_step == 1 && educationLevel == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Выберите образование')));
-        return;
-      }
-      setState(() => _step++);
-    }
-  }
-
-  void _prevStep() => setState(() => _step--);
-
   void _submit() {
-    if (!_formKey.currentState!.validate() || educationLevel == null) {
+    if (!formKey.currentState!.validate() || educationLevel == null || status == null) {
       if (educationLevel == null) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Выберите образование')));
+      }
+      if (status == null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Выберите статус')));
       }
       return;
     }
@@ -110,16 +85,27 @@ class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
   @override
   Widget build(BuildContext ctx) {
     final steps = [_buildStepOne(ctx), _buildStepTwo(ctx), _buildStepThree(ctx)];
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: steps[_step],
-          ),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Form(
+                  key: formKey,
+                  child: steps[step],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: step == 2
+                  ? CustomButton(text: 'Зарегистрироваться', onPressed: _submit)
+                  : CustomButton(text: 'Далее', onPressed: nextStep),
+            ),
+          ],
         ),
       ),
     );
@@ -130,22 +116,20 @@ class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.arrow_back)),
-        Text('Добро пожаловать!', style: AppTextStyles.onboardingTitle.copyWith(color: AppColors.primary)),
-        const SizedBox(height: 8),
-        const Text(
-          'Пожалуйста, заполните короткую форму — это нужно, чтобы мы знали, в каком клубе вы работаете и могли подключить Вас к системе для заказов и обслуживания оборудования.',
+        formStepTitle('Добро пожаловать!'),
+        formDescription(
+          'Пожалуйста, заполните короткую форму — это нужно, чтобы мы знали, в каком клубе вы работаете и могли подключить Вас к системе.',
         ),
-        const SizedBox(height: 24),
         LabeledTextField(
           label: 'ФИО',
           controller: _fio,
-          validator: _validateNotEmpty,
+          validator: Validators.notEmpty,
           icon: Icons.person,
         ),
         LabeledTextField(
           label: 'Дата рождения',
           controller: _birth,
-          validator: _validateBirth,
+          validator: Validators.birth(birthDate),
           readOnly: true,
           onTap: _pickBirthDate,
           icon: Icons.calendar_today,
@@ -153,15 +137,9 @@ class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
         LabeledTextField(
           label: 'Номер телефона',
           controller: _phone,
-          validator: _validatePhone,
+          validator: Validators.phone,
           keyboardType: TextInputType.phone,
           icon: Icons.phone,
-        ),
-        const SizedBox(height: 52),
-        SizedBox(
-          width: double.infinity,
-          height: 65,
-          child: CustomButton(text: 'Далее', onPressed: _nextStep),
         ),
       ],
     );
@@ -171,8 +149,8 @@ class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        IconButton(onPressed: _prevStep, icon: const Icon(Icons.arrow_back)),
-        const Text('Какое у Вас образование?', style: AppTextStyles.onboardingTitle),
+        IconButton(onPressed: prevStep, icon: const Icon(Icons.arrow_back)),
+        sectionTitle('Какое у Вас образование?'),
         const SizedBox(height: 16),
         RadioGroupWrap(
           options: const [
@@ -189,18 +167,12 @@ class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
         LabeledTextField(
           label: 'Наименование образовательного учреждения',
           controller: _educationName,
-          validator: _validateNotEmpty,
+          validator: Validators.notEmpty,
         ),
         LabeledTextField(
           label: 'Дополнительное образование (курсы и т.д.)',
           controller: _extraEducation,
-          validator: _validateNotEmpty,
-        ),
-        const SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          height: 65,
-          child: CustomButton(text: 'Далее', onPressed: _nextStep),
+          validator: Validators.notEmpty,
         ),
       ],
     );
@@ -210,41 +182,42 @@ class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        IconButton(onPressed: _prevStep, icon: const Icon(Icons.arrow_back)),
-        const Text('Стаж работы', style: AppTextStyles.onboardingTitle),
+        IconButton(onPressed: prevStep, icon: const Icon(Icons.arrow_back)),
+        sectionTitle('Стаж работы'),
         const SizedBox(height: 8),
         LabeledTextField(
           label: 'Общий стаж работы',
           controller: _workYears,
-          validator: _validateInteger,
+          validator: Validators.integer,
           keyboardType: TextInputType.number,
         ),
         LabeledTextField(
           label: 'Стаж в боулинге',
           controller: _bowlingYears,
-          validator: _validateInteger,
+          validator: Validators.integer,
           keyboardType: TextInputType.number,
         ),
         LabeledTextField(
           label: 'Текущее место работы',
           controller: _currentClub,
-          validator: _validateNotEmpty,
+          validator: Validators.notEmpty,
         ),
         LabeledTextField(
           label: 'Где и когда работали в боулинге',
           controller: _bowlingHistory,
-          validator: _validateNotEmpty,
+          validator: Validators.notEmpty,
         ),
         LabeledTextField(
           label: 'Навыки и преимущества',
           controller: _skills,
-          validator: _validateNotEmpty,
+          validator: Validators.notEmpty,
         ),
-        const SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          height: 65,
-          child: CustomButton(text: 'Зарегистрироваться', onPressed: _submit),
+        const SizedBox(height: 16),
+        formDescription('Ваш статус:'),
+        RadioGroupHorizontal(
+          options: const ['ИП', 'Самозанятый'],
+          groupValue: status,
+          onChanged: (v) => setState(() => status = v),
         ),
       ],
     );
