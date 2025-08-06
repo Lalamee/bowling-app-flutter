@@ -37,10 +37,9 @@ class RadioGroupVertical extends StatelessWidget {
                   ),
                 ),
                 Container(
+                  width: 110,   
                   height: 29,
-                  constraints: const BoxConstraints(minWidth: 75),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  alignment: Alignment.centerLeft,
+                  alignment: Alignment.center, 
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),

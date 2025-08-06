@@ -17,46 +17,64 @@ class RadioGroupHorizontal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: options.map((label) {
         final isSelected = label == groupValue;
-        return Expanded(
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           child: InkWell(
             onTap: () => onChanged(label),
+            borderRadius: BorderRadius.circular(10),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: Container(
-                    width: 16,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: isSelected ? AppColors.primary : Colors.grey,
-                        width: 2,
-                      ),
-                      color: isSelected ? AppColors.primary : Colors.transparent,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    height: 29,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: isSelected ? AppColors.primary : Colors.grey),
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
+                Container(
+                  width: 16,
+                  height: 16,
+                  margin: const EdgeInsets.only(right: 8),
+                  decoration: isSelected
+                      ? BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.primary,
+                          border: Border.all(
+                            color: AppColors.primary,
+                            width: 2,
+                          ),
+                        )
+                      : BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.transparent,
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 1,
+                          ),
                         ),
-                      ],
+                ),
+                Container(
+                  width: 113,
+                  height: 29,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isSelected ? AppColors.primary : Colors.grey,
+                      width: 1,
                     ),
-                    alignment: Alignment.center,
-                    child: Text(label, style: AppTextStyles.formInput),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    label,
+                    style: AppTextStyles.formInput.copyWith(
+                      color: isSelected ? AppColors.primary : Colors.black,
+                    ),
                   ),
                 ),
               ],
