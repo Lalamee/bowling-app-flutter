@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/colors.dart';
 import '../theme/text_styles.dart';
+import '../theme/radio_chip_style.dart';
 
 class RadioGroupHorizontal extends StatelessWidget {
   final List<String> options;
@@ -20,36 +21,19 @@ class RadioGroupHorizontal extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: options.map((label) {
         final isSelected = label == groupValue;
-
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: InkWell(
+          child: GestureDetector(
             onTap: () => onChanged(label),
-            borderRadius: BorderRadius.circular(10),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  width: 16,
-                  height: 16,
-                  margin: const EdgeInsets.only(right: 8),
-                  decoration: isSelected
-                      ? BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.primary,
-                          border: Border.all(
-                            color: AppColors.primary,
-                            width: 2,
-                          ),
-                        )
-                      : BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.transparent,
-                          border: Border.all(
-                            color: Colors.grey,
-                            width: 1,
-                          ),
-                        ),
+                Radio<String>(
+                  value: label,
+                  groupValue: groupValue,
+                  onChanged: (val) => onChanged(val),
+                  activeColor: AppColors.primary,
+                  visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 Container(
                   width: 113,
@@ -59,22 +43,21 @@ class RadioGroupHorizontal extends StatelessWidget {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: isSelected ? AppColors.primary : Colors.grey,
-                      width: 1,
+                      color: isSelected ? AppColors.primary : Colors.grey.shade400,
+                      width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.05),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
+                        blurRadius: 3,
+                        offset: const Offset(0, 1),
                       ),
                     ],
                   ),
                   child: Text(
                     label,
-                    style: AppTextStyles.formInput.copyWith(
-                      color: isSelected ? AppColors.primary : Colors.black,
-                    ),
+                    style: RadioChipStyle.textStyle(isSelected),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],

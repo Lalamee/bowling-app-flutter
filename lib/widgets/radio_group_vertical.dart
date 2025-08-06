@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../theme/colors.dart';
+import '../theme/text_styles.dart';
+import '../theme/radio_chip_style.dart';
 
 class RadioGroupVertical extends StatelessWidget {
   final List<String> options;
@@ -23,37 +26,26 @@ class RadioGroupVertical extends StatelessWidget {
             onTap: () => onChanged(label),
             child: Row(
               children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  margin: const EdgeInsets.only(right: 8),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isSelected ? const Color(0xFF8A002D) : Colors.grey,
-                      width: 2,
-                    ),
-                    color: isSelected ? const Color(0xFF8A002D) : Colors.transparent,
-                  ),
+                Radio<String>(
+                  value: label,
+                  groupValue: groupValue,
+                  onChanged: (val) => onChanged(val),
+                  activeColor: AppColors.primary,
+                  visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 Container(
-                  width: 110,   
-                  height: 29,
-                  alignment: Alignment.center, 
+                  padding: RadioChipStyle.padding,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(RadioChipStyle.borderRadius),
                     border: Border.all(
-                      color: isSelected ? const Color(0xFF8A002D) : Colors.grey.shade400,
+                      color: isSelected ? AppColors.primary : Colors.grey.shade400,
                     ),
                   ),
                   child: Text(
                     label,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: isSelected ? const Color(0xFF8A002D) : Colors.grey[700],
-                    ),
+                    style: RadioChipStyle.textStyle(isSelected),
                   ),
                 ),
               ],
