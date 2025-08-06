@@ -3,7 +3,8 @@ import 'package:intl/intl.dart';
 import '../theme/colors.dart';
 import '../theme/text_styles.dart';
 import '../widgets/labeled_text_field.dart';
-import '../widgets/radio_group.dart';
+import '../widgets/radio_group_horizontal.dart';
+import '../widgets/radio_group_vertical.dart';
 import '../widgets/custom_button.dart';
 
 class RegisterMechanicScreen extends StatefulWidget {
@@ -77,7 +78,8 @@ class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.only(bottom: 1032),
+
           child: Form(
             key: _formKey,
             child: Column(
@@ -129,7 +131,7 @@ class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
                   validator: _validateNotEmpty),
                 const SizedBox(height: 16),
                 const Text('Статус', style: AppTextStyles.formLabel),
-                RadioGroup(
+                RadioGroupHorizontal(
                   options: const ['ИП', 'Самозанятый'],
                   groupValue: status,
                   onChanged: (v) => setState(() => status = v),
