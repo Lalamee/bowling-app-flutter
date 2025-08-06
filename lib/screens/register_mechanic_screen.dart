@@ -64,7 +64,7 @@ class _RegisterMechanicScreenState extends State<RegisterMechanicScreen> {
     if (picked != null) {
       setState(() {
         birthDate = picked;
-        _birth.text = DateFormat('dd / MM / yyyy').format(picked);
+        _birth.text = DateFormat('dd.MM.yyyy').format(picked);
       });
     }
   }
