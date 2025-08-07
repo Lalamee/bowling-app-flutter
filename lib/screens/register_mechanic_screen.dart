@@ -10,6 +10,7 @@ import '../utils/validators.dart';
 import '../utils/form_navigation.dart';
 import '../widgets/common_ui.dart';
 import '../widgets/radio_group_horizontal.dart';
+import '../services/auth_service.dart';
 
 class RegisterMechanicScreen extends StatefulWidget {
   const RegisterMechanicScreen({Key? key}) : super(key: key);
@@ -33,7 +34,7 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
   final _bowlingHistory = TextEditingController();
   final _skills = TextEditingController();
 
-  String? educationLevel;
+  String? educationLevelId;
   String? status;
 
   @override
@@ -69,17 +70,43 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
     }
   }
 
-  void _submit() {
-    if (!formKey.currentState!.validate() || educationLevel == null || status == null) {
-      if (educationLevel == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Выберите образование')));
+  Future<void> _submit() async {
+    if (!formKey.currentState!.validate() || educationLevelId == null || status == null) {
+      if (educationLevelId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Выберите уровень образования')));
       }
       if (status == null) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Выберите статус')));
       }
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Регистрация механика выполнена')));
+
+    final data = {
+      'fio': _fio.text.trim(),
+      'birth': DateFormat('yyyy-MM-dd').format(birthDate!),
+      'phone': _phone.text.trim(),
+      'password': 'password123',
+      'educationLevelId': educationLevelId!,
+      'educationName': _educationName.text.trim(),
+      'specializationId': '1',
+      'advantages': _extraEducation.text.trim(),
+      'workYears': _workYears.text.trim(),
+      'bowlingYears': _bowlingYears.text.trim(),
+      'currentClub': _currentClub.text.trim(),
+      'bowlingHistory': _bowlingHistory.text.trim(),
+      'skills': _skills.text.trim(),
+      'status': status,
+      'workPlaces': _currentClub.text.trim(),
+      'workPeriods': _bowlingHistory.text.trim()
+    };
+
+    final success = await AuthService.registerMechanic(data);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Регистрация механика успешна')));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ошибка при отправке данных')));
+    }
   }
 
   @override
@@ -118,7 +145,7 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
         IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.arrow_back)),
         formStepTitle('Добро пожаловать!'),
         formDescription(
-          'Пожалуйста, заполните короткую форму — это нужно, чтобы мы знали, в каком клубе вы работаете и могли подключить Вас к системе.',
+          'Пожалуйста, заполните форму — это нужно, чтобы мы знали, где вы работаете и могли подключить Вас к системе.',
         ),
         LabeledTextField(
           label: 'ФИО',
@@ -160,8 +187,8 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
             'средне-профессиональное',
             'другое',
           ],
-          groupValue: educationLevel,
-          onChanged: (v) => setState(() => educationLevel = v),
+          groupValue: educationLevelId,
+          onChanged: (v) => setState(() => educationLevelId = v!.split(':')[0]),
         ),
         const SizedBox(height: 16),
         LabeledTextField(
