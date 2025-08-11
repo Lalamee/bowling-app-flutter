@@ -40,16 +40,10 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
   @override
   void dispose() {
     [
-      _fio,
-      _birth,
-      _phone,
-      _educationName,
-      _extraEducation,
-      _workYears,
-      _bowlingYears,
-      _currentClub,
-      _bowlingHistory,
-      _skills,
+      _fio, _birth, _phone,
+      _educationName, _extraEducation,
+      _workYears, _bowlingYears,
+      _currentClub, _bowlingHistory, _skills
     ].forEach((c) => c.dispose());
     super.dispose();
   }
@@ -81,6 +75,12 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
       return;
     }
 
+    final match = RegExp(r'^\d+\s+лет\s+-\s+Боулинг\s+["\u00AB\u201D](.+?)["\u00BB\u201D]\s+\(с\s+(\d{4})-(\d{4})\)\$')
+        .firstMatch(_bowlingHistory.text.trim());
+
+    final workPlace = match?.group(1) ?? _currentClub.text.trim();
+    final workPeriod = (match != null) ? '${match.group(2)}-${match.group(3)}' : '';
+
     final data = {
       'fio': _fio.text.trim(),
       'birth': DateFormat('yyyy-MM-dd').format(birthDate!),
@@ -96,8 +96,8 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
       'bowlingHistory': _bowlingHistory.text.trim(),
       'skills': _skills.text.trim(),
       'status': status,
-      'workPlaces': _currentClub.text.trim(),
-      'workPeriods': _bowlingHistory.text.trim()
+      'workPlaces': workPlace,
+      'workPeriods': workPeriod,
     };
 
     final success = await AuthService.registerMechanic(data);
@@ -128,7 +128,7 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
             ),
             Padding(
               padding: const EdgeInsets.all(24),
-              child: step == 2
+              child: step == steps.length - 1
                   ? CustomButton(text: 'Зарегистрироваться', onPressed: _submit)
                   : CustomButton(text: 'Далее', onPressed: nextStep),
             ),
@@ -144,9 +144,7 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
       children: [
         IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.arrow_back)),
         formStepTitle('Добро пожаловать!'),
-        formDescription(
-          'Пожалуйста, заполните форму — это нужно, чтобы мы знали, где вы работаете и могли подключить Вас к системе.',
-        ),
+        formDescription('Пожалуйста, заполните форму — это нужно, чтобы мы знали, где вы работаете и могли подключить Вас к системе.'),
         LabeledTextField(
           label: 'ФИО',
           controller: _fio,
@@ -221,7 +219,11 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
         LabeledTextField(
           label: 'Стаж в боулинге',
           controller: _bowlingYears,
-          validator: Validators.integer,
+          validator: (v) {
+            final basic = Validators.integer(v);
+            if (basic != null) return basic;
+            return Validators.validateExperience(_workYears.text, v);
+          },
           keyboardType: TextInputType.number,
         ),
         LabeledTextField(
@@ -232,7 +234,7 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
         LabeledTextField(
           label: 'Где и когда работали в боулинге',
           controller: _bowlingHistory,
-          validator: Validators.notEmpty,
+          validator: Validators.bowlingHistoryFormat,
         ),
         LabeledTextField(
           label: 'Навыки и преимущества',
