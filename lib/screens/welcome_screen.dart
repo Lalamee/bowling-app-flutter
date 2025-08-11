@@ -1,31 +1,41 @@
 import 'package:flutter/material.dart';
 import 'register_role_selection.dart';
+import '../widgets/bowling_market_title.dart';
 
 class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('BOWLING Market', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-            SizedBox(height: 40),
+            const BowlingMarketTitle(fontSize: 28),
+            const SizedBox(height: 40),
             ElevatedButton(
-              onPressed: () {},
-              child: Text('Войти'),
-              style: ElevatedButton.styleFrom(minimumSize: Size.fromHeight(50)),
+              onPressed: () {
+
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+              ),
+              child: const Text('Войти'),
             ),
             TextButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => RegisterRoleSelectionScreen())),
-              child: Text('Зарегистрироваться'),
-            )
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const RegisterRoleSelectionScreen()),
+                );
+              },
+              child: const Text('Зарегистрироваться'),
+            ),
           ],
         ),
       ),
     );
   }
 }
-
-///RegisterRoleSelectionScreen на 21 строечке 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'register_owner_screen.dart';
 import 'register_mechanic_screen.dart';
+import '../widgets/bowling_market_title.dart';
 
 class RegisterRoleSelectionScreen extends StatelessWidget {
   const RegisterRoleSelectionScreen({super.key});
@@ -13,57 +14,50 @@ class RegisterRoleSelectionScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterMechanicScreen()));
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(60),
-                backgroundColor: Colors.grey[700],
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-              ),
-              child: const Text(
-                'Я МЕХАНИК',
-                style: TextStyle(fontSize: 16, color: Colors.white),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterOwnerScreen()));
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(60),
-                backgroundColor: const Color(0xFFB2002D),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-              ),
-              child: const Text(
-                'Я ВЛАДЕЛЕЦ КЛУБА',
-                style: TextStyle(fontSize: 16, color: Colors.white),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterMechanicScreen()));
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(60),
+                  backgroundColor: Colors.grey[700],
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                ),
+                child: const Text(
+                  'Я МЕХАНИК',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
               ),
             ),
-          ),
-          const Spacer(),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 24),
-            child: Text.rich(
-              TextSpan(
-                text: 'BOWLING',
-                style: TextStyle(fontWeight: FontWeight.bold),
-                children: [TextSpan(text: 'Market', style: TextStyle(color: Color(0xFFB2002D)))],
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterOwnerScreen()));
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(60),
+                  backgroundColor: const Color(0xFFB2002D),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                ),
+                child: const Text(
+                  'Я ВЛАДЕЛЕЦ КЛУБА',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
               ),
-              style: TextStyle(fontSize: 20),
             ),
-          ),
-        ],
+            const Spacer(),
+            const Padding(
+              padding: EdgeInsets.only(bottom: 24),
+              child: BowlingMarketTitle(fontSize: 20),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

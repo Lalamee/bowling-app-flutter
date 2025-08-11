@@ -27,15 +27,14 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
   final _phone = TextEditingController();
   final _birth = TextEditingController();
 
-  // динамический список клубов
   final List<TextEditingController> _clubCtrls = [];
 
   final _fioFocus = FocusNode();
   final _phoneFocus = FocusNode();
   final _addrFocus = FocusNode();
 
-  String _status = 'Механик'; // 'Собственник' | 'Механик'
-  int _navIndex = 3; // Заказы=0, Поиск=1, Клуб=2, Профиль=3
+  String _status = 'Механик'; 
+  int _navIndex = 3; 
 
   @override
   void initState() {
@@ -47,13 +46,11 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
     _birth.text = DateFormat('dd.MM.yyyy').format(p.birthDate);
     _status = p.status;
 
-    // инициализация клубов
     final clubs = (p.clubs.isEmpty ? [p.clubName] : p.clubs);
     for (final c in clubs) {
       _clubCtrls.add(TextEditingController(text: c));
     }
 
-    // фокус по «карандашу»
     WidgetsBinding.instance.addPostFrameCallback((_) {
       switch (widget.focus) {
         case EditFocus.name:
@@ -84,7 +81,6 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
     super.dispose();
   }
 
-  // UI helpers
   InputDecoration _fieldDecoration({String? hint, bool filled = true}) {
     return InputDecoration(
       hintText: hint,
@@ -164,7 +160,6 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
           ),
           const SizedBox(height: 18),
 
-          // 1) ФИО
           const Text('ФИО', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
           const SizedBox(height: 6),
           TextField(
@@ -174,7 +169,6 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
           ),
           const SizedBox(height: 16),
 
-          // 2) Место работы (список клубов)
           const Text('Место работы', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
           const SizedBox(height: 6),
           ...List.generate(_clubCtrls.length, (i) {
@@ -235,7 +229,6 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
           ),
           const SizedBox(height: 12),
 
-          // 3) Адрес
           const Text('Адрес', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
           const SizedBox(height: 6),
           TextField(
@@ -245,7 +238,6 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
           ),
           const SizedBox(height: 16),
 
-          // 4) Ваш статус
           const Text('Ваш статус:', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
           const SizedBox(height: 8),
           RadioGroupHorizontal(
@@ -255,7 +247,6 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
           ),
           const SizedBox(height: 20),
 
-          // 5) Подтверждение (заголовок + серая кнопка)
           const Text('Подтверждение', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
           const SizedBox(height: 6),
           SizedBox(
@@ -278,7 +269,6 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
           ),
           const SizedBox(height: 18),
 
-          // 6) Дата рождения (readOnly)
           LabeledTextField(
             label: 'Дата рождения',
             controller: _birth,
@@ -286,7 +276,6 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
           ),
           const SizedBox(height: 12),
 
-          // 7) Номер телефона (readOnly, розовый фон)
           const Text('Номер телефона', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
           const SizedBox(height: 6),
           TextField(
@@ -295,7 +284,7 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
             readOnly: true,
             decoration: InputDecoration(
               filled: true,
-              fillColor: const Color(0xFFF0DADF), // из макета
+              fillColor: const Color(0xFFF0DADF), 
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -305,7 +294,6 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
           ),
           const SizedBox(height: 8),
 
-          // 8) Подсказка
           const Text(
             'Чтобы изменить номер телефона, обратитесь в службу поддержки 8 800 000 00 00.',
             style: TextStyle(fontSize: 13, color: AppColors.darkGray),
@@ -317,8 +305,6 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
         currentIndex: _navIndex,
         onTap: (i) {
           setState(() => _navIndex = i);
-          // TODO: навигация на другие экраны:
-          // 0 — Заказы, 1 — Поиск, 2 — Клуб, 3 — Профиль
         },
         type: BottomNavigationBarType.fixed,
         selectedItemColor: AppColors.primary,
