@@ -3,6 +3,8 @@ import '../theme/colors.dart';
 import '../widgets/profile_tile.dart';
 import '../models/mechanic_profile.dart';
 import 'edit_mechanic_profile_screen.dart';
+import '../widgets/app_bottom_nav.dart';
+import 'orders/orders_screen.dart';
 
 enum EditFocus { none, name, phone, address }
 
@@ -14,7 +16,6 @@ class MechanicProfileScreen extends StatefulWidget {
 }
 
 class _MechanicProfileScreenState extends State<MechanicProfileScreen> {
-  int _navIndex = 3; // Профиль
   late MechanicProfile profile;
 
   @override
@@ -23,12 +24,12 @@ class _MechanicProfileScreenState extends State<MechanicProfileScreen> {
     profile = MechanicProfile(
       fullName: 'Механик Иван Иванович',
       phone: '+7 (980) 001-01-01',
-      clubName: 'Боулинг клуб "Кегли"', // для совместимости
+      clubName: 'Боулинг клуб "Кегли"',
       clubs: ['Боулинг клуб "Кегли"'],
       address: 'г. Воронеж, ул. Тверская, д. 45',
       workplaceVerified: false,
       birthDate: DateTime(1989, 2, 24),
-      status: 'Самозанятый', // или 'Механик'
+      status: 'Самозанятый',
     );
   }
 
@@ -70,23 +71,18 @@ class _MechanicProfileScreenState extends State<MechanicProfileScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         children: [
-          // ФИО
           ProfileTile(
             icon: Icons.person,
             text: profile.fullName,
             onEdit: () => _openEdit(EditFocus.name),
           ),
           const SizedBox(height: 10),
-
-          // Телефон
           ProfileTile(
             icon: Icons.phone,
             text: profile.phone,
             onEdit: () => _openEdit(EditFocus.phone),
           ),
           const SizedBox(height: 10),
-
-          // Статус (только отображение)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
@@ -121,18 +117,12 @@ class _MechanicProfileScreenState extends State<MechanicProfileScreen> {
             ),
           ),
           const SizedBox(height: 10),
-
-          // База знаний
           ProfileTile(
             icon: Icons.menu_book_rounded,
             text: 'База знаний',
-            onTap: () {
-              // TODO: переход в библиотеку знаний
-            },
+            onTap: () {},
           ),
           const SizedBox(height: 10),
-
-          // Места работы — несколько плиток
           ...List.generate(profile.clubs.length, (i) {
             final club = profile.clubs[i];
             return Padding(
@@ -140,74 +130,52 @@ class _MechanicProfileScreenState extends State<MechanicProfileScreen> {
               child: ProfileTile(
                 icon: Icons.location_searching_rounded,
                 text: club,
-                showAlertBadge: !profile.workplaceVerified && i == 0, // бейдж только на первой
+                showAlertBadge: !profile.workplaceVerified && i == 0,
                 onTap: () => _openEdit(EditFocus.none),
               ),
             );
           }),
           const SizedBox(height: 10),
-
-          // Адрес
           ProfileTile(
             icon: Icons.location_on_rounded,
             text: profile.address,
             onEdit: () => _openEdit(EditFocus.address),
           ),
           const SizedBox(height: 10),
-
           ProfileTile(
             icon: Icons.history_rounded,
             text: 'История заказов',
-            onTap: () {
-              // TODO: открыть историю
-            },
+            onTap: () {},
           ),
           const SizedBox(height: 10),
-
           ProfileTile(
             icon: Icons.notifications_active_outlined,
             text: 'Оповещения',
-            onTap: () {
-              // TODO: открыть оповещения
-            },
+            onTap: () {},
           ),
           const SizedBox(height: 10),
-
           ProfileTile(
             icon: Icons.star_border_rounded,
             text: 'Избранные заказы/детали',
-            onTap: () {
-              // TODO: открыть избранное
-            },
+            onTap: () {},
           ),
           const SizedBox(height: 10),
-
           ProfileTile(
             icon: Icons.exit_to_app_rounded,
             text: 'Выход',
             danger: true,
-            onTap: () {
-              // TODO: logout
-            },
+            onTap: () {},
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _navIndex,
+      bottomNavigationBar: AppBottomNav(
+        currentIndex: 3,
         onTap: (i) {
           if (i == 3) return;
-          setState(() => _navIndex = i);
-          // TODO: навигация на остальные вкладки:
-          // 0 — Заказы, 1 — Поиск, 2 — Клуб
+          if (i == 0) {
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const OrdersScreen()));
+          }
         },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.primary,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'Заказы'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Поиск'),
-          BottomNavigationBarItem(icon: Icon(Icons.storefront_outlined), label: 'Клуб'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_circle_outlined), label: 'Профиль'),
-        ],
       ),
     );
   }
