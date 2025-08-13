@@ -5,6 +5,7 @@ import '../models/mechanic_profile.dart';
 import 'edit_mechanic_profile_screen.dart';
 import '../widgets/app_bottom_nav.dart';
 import '../utils/bottom_nav.dart';
+import 'knowledge_base_screen.dart';
 
 enum EditFocus { none, name, phone, address }
 
@@ -77,7 +78,11 @@ class _MechanicProfileScreenState extends State<MechanicProfileScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          ProfileTile(icon: Icons.menu_book_rounded, text: 'База знаний', onTap: () {}),
+          ProfileTile(
+            icon: Icons.menu_book_rounded,
+            text: 'База знаний',
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KnowledgeBaseScreen())),
+          ),
           const SizedBox(height: 10),
           ...List.generate(profile.clubs.length, (i) {
             final club = profile.clubs[i];
