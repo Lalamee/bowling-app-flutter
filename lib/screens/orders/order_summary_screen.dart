@@ -4,6 +4,8 @@ import '../../widgets/custom_button.dart';
 import '../../widgets/orders/detail_row.dart';
 import '../../dialogs/confirm_order_dialog.dart';
 import '../../models/order_item.dart';
+import '../../widgets/app_bottom_nav.dart';
+import '../../utils/bottom_nav.dart';
 
 class OrderSummaryScreen extends StatefulWidget {
   final String orderNumber;
@@ -27,12 +29,12 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     super.initState();
     items = widget.initialItems.isEmpty
         ? [
-            OrderItem(title: 'Деталь №1', qty: 2),
-            OrderItem(title: 'Деталь №2', qty: 5),
-            OrderItem(title: 'Деталь №3', qty: 10),
-            OrderItem(title: 'Деталь №4', qty: 1),
-            OrderItem(title: '.....', qty: 0),
-          ]
+      OrderItem(title: 'Деталь №1', qty: 2),
+      OrderItem(title: 'Деталь №2', qty: 5),
+      OrderItem(title: 'Деталь №3', qty: 10),
+      OrderItem(title: 'Деталь №4', qty: 1),
+      OrderItem(title: '.....', qty: 0),
+    ]
         : List<OrderItem>.from(widget.initialItems);
   }
 
@@ -53,10 +55,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      widget.orderNumber,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textDark),
-                    ),
+                    child: Text(widget.orderNumber, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textDark)),
                   ),
                 ],
               ),
@@ -73,10 +72,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               child: Column(
                 children: [
-                  CustomButton(
-                    text: 'Продолжить выбор деталей',
-                    onPressed: () => Navigator.pop(context),
-                  ),
+                  CustomButton(text: 'Продолжить выбор деталей', onPressed: () => Navigator.pop(context)),
                   const SizedBox(height: 12),
                   CustomButton(
                     text: 'Сохранить черновик',
@@ -89,19 +85,12 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               ),
             ),
             const SizedBox(height: 6),
-            NavigationBar(
-              backgroundColor: AppColors.white,
-              indicatorColor: Colors.transparent,
-              selectedIndex: 0,
-              destinations: const [
-                NavigationDestination(icon: Icon(Icons.menu), label: 'Заказы'),
-                NavigationDestination(icon: Icon(Icons.autorenew), label: 'Каталог'),
-                NavigationDestination(icon: Icon(Icons.settings), label: 'Клуб'),
-                NavigationDestination(icon: Icon(Icons.person), label: 'Профиль'),
-              ],
-            ),
           ],
         ),
+      ),
+      bottomNavigationBar: AppBottomNav(
+        currentIndex: 0,
+        onTap: (i) => BottomNavDirect.go(context, 0, i),
       ),
     );
   }

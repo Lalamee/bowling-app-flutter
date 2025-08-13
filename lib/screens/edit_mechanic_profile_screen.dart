@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../theme/colors.dart';
 import '../widgets/labeled_text_field.dart';
 import '../widgets/radio_group_horizontal.dart';
 import '../models/mechanic_profile.dart';
 import 'mechanic_profile_screen.dart' show EditFocus;
+import '../widgets/app_bottom_nav.dart';
+import '../utils/bottom_nav.dart';
 
 class EditMechanicProfileScreen extends StatefulWidget {
   final MechanicProfile initial;
@@ -26,15 +27,12 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
   final _address = TextEditingController();
   final _phone = TextEditingController();
   final _birth = TextEditingController();
-
   final List<TextEditingController> _clubCtrls = [];
-
   final _fioFocus = FocusNode();
   final _phoneFocus = FocusNode();
   final _addrFocus = FocusNode();
 
-  String _status = 'Механик'; 
-  int _navIndex = 3; 
+  String _status = 'Механик';
 
   @override
   void initState() {
@@ -45,12 +43,10 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
     _phone.text = p.phone;
     _birth.text = DateFormat('dd.MM.yyyy').format(p.birthDate);
     _status = p.status;
-
     final clubs = (p.clubs.isEmpty ? [p.clubName] : p.clubs);
     for (final c in clubs) {
       _clubCtrls.add(TextEditingController(text: c));
     }
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       switch (widget.focus) {
         case EditFocus.name:
@@ -102,9 +98,7 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
     );
   }
 
-  void _addClubField() {
-    setState(() => _clubCtrls.add(TextEditingController()));
-  }
+  void _addClubField() => setState(() => _clubCtrls.add(TextEditingController()));
 
   void _removeClubField(int i) {
     if (_clubCtrls.length <= 1) return;
@@ -115,12 +109,8 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
   }
 
   void _saveAndPop() {
-    final clubs = _clubCtrls
-        .map((c) => c.text.trim())
-        .where((s) => s.isNotEmpty)
-        .toList();
+    final clubs = _clubCtrls.map((c) => c.text.trim()).where((s) => s.isNotEmpty).toList();
     final clubName = clubs.isNotEmpty ? clubs.first : '';
-
     final updated = widget.initial.copyWith(
       fullName: _fio.text.trim(),
       address: _address.text.trim(),
@@ -129,7 +119,6 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
       clubs: clubs,
       status: _status,
     );
-
     Navigator.pop(context, updated);
   }
 
@@ -144,31 +133,19 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
           onPressed: _saveAndPop,
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textDark),
         ),
-        title: const Text(
-          'Персональная информация',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textDark),
-        ),
+        title: const Text('Персональная информация', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textDark)),
         centerTitle: false,
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
           const SizedBox(height: 6),
-          const Text(
-            'Для редактирования информации нажмите на поле ввода',
-            style: TextStyle(fontSize: 13, color: AppColors.darkGray),
-          ),
+          const Text('Для редактирования информации нажмите на поле ввода', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
           const SizedBox(height: 18),
-
           const Text('ФИО', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
           const SizedBox(height: 6),
-          TextField(
-            controller: _fio,
-            focusNode: _fioFocus,
-            decoration: _fieldDecoration(),
-          ),
+          TextField(controller: _fio, focusNode: _fioFocus, decoration: _fieldDecoration()),
           const SizedBox(height: 16),
-
           const Text('Место работы', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
           const SizedBox(height: 6),
           ...List.generate(_clubCtrls.length, (i) {
@@ -177,12 +154,7 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
               padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
               child: Row(
                 children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _clubCtrls[i],
-                      decoration: _fieldDecoration(hint: 'Боулинг клуб'),
-                    ),
-                  ),
+                  Expanded(child: TextField(controller: _clubCtrls[i], decoration: _fieldDecoration(hint: 'Боулинг клуб'))),
                   const SizedBox(width: 8),
                   if (_clubCtrls.length > 1)
                     SizedBox(
@@ -219,25 +191,15 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
               ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.add),
-                  SizedBox(width: 8),
-                  Text('Добавить клуб'),
-                ],
+                children: [Icon(Icons.add), SizedBox(width: 8), Text('Добавить клуб')],
               ),
             ),
           ),
           const SizedBox(height: 12),
-
           const Text('Адрес', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
           const SizedBox(height: 6),
-          TextField(
-            controller: _address,
-            focusNode: _addrFocus,
-            decoration: _fieldDecoration(hint: 'г. Воронеж, ул. Тверская, д. 45'),
-          ),
+          TextField(controller: _address, focusNode: _addrFocus, decoration: _fieldDecoration(hint: 'г. Воронеж, ул. Тверская, д. 45')),
           const SizedBox(height: 16),
-
           const Text('Ваш статус:', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
           const SizedBox(height: 8),
           RadioGroupHorizontal(
@@ -246,7 +208,6 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
             onChanged: (v) => setState(() => _status = v ?? _status),
           ),
           const SizedBox(height: 20),
-
           const Text('Подтверждение', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
           const SizedBox(height: 6),
           SizedBox(
@@ -257,25 +218,14 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
                 backgroundColor: AppColors.darkGray,
                 foregroundColor: AppColors.white,
                 elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text(
-                'Отправить запрос на подтверждение',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-              ),
+              child: const Text('Отправить запрос на подтверждение', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
             ),
           ),
           const SizedBox(height: 18),
-
-          LabeledTextField(
-            label: 'Дата рождения',
-            controller: _birth,
-            readOnly: true,
-          ),
+          LabeledTextField(label: 'Дата рождения', controller: _birth, readOnly: true),
           const SizedBox(height: 12),
-
           const Text('Номер телефона', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
           const SizedBox(height: 6),
           TextField(
@@ -284,37 +234,19 @@ class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
             readOnly: true,
             decoration: InputDecoration(
               filled: true,
-              fillColor: const Color(0xFFF0DADF), 
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
+              fillColor: const Color(0xFFF0DADF),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             ),
           ),
           const SizedBox(height: 8),
-
-          const Text(
-            'Чтобы изменить номер телефона, обратитесь в службу поддержки 8 800 000 00 00.',
-            style: TextStyle(fontSize: 13, color: AppColors.darkGray),
-          ),
+          const Text('Чтобы изменить номер телефона, обратитесь в службу поддержки 8 800 000 00 00.', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
           const SizedBox(height: 28),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _navIndex,
-        onTap: (i) {
-          setState(() => _navIndex = i);
-        },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.darkGray,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'Заказы'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Поиск'),
-          BottomNavigationBarItem(icon: Icon(Icons.storefront_outlined), label: 'Клуб'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_circle_outlined), label: 'Профиль'),
-        ],
+      bottomNavigationBar: AppBottomNav(
+        currentIndex: 3,
+        onTap: (i) => BottomNavDirect.go(context, 3, i),
       ),
     );
   }

@@ -9,8 +9,9 @@ import '../../sheets/order_info_sheet.dart';
 import '../../dialogs/confirm_order_dialog.dart';
 import '../../models/order_item.dart';
 import '../../widgets/app_bottom_nav.dart';
-import '../mechanic_profile_screen.dart';
+import '../../utils/bottom_nav.dart';
 import 'order_summary_screen.dart';
+
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({Key? key}) : super(key: key);
@@ -35,12 +36,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               child: Row(
                 children: [
                   const Expanded(
-                    child: Text(
-                      'Заказы',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textDark),
-                    ),
+                    child: Text('Заказы', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textDark)),
                   ),
                   IconSquareButton(
                     icon: Icons.add,
@@ -86,10 +82,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     alignment: Alignment.centerRight,
                     children: [
                       const FlatTile(label: 'Модуль 5', trailing: Icons.expand_more),
-                      Positioned(
-                        right: 10,
-                        child: MiniAddButton(onTap: _openQuantity),
-                      ),
+                      Positioned(right: 10, child: MiniAddButton(onTap: _openQuantity)),
                     ],
                   ),
                 ],
@@ -100,19 +93,14 @@ class _OrdersScreenState extends State<OrdersScreen> {
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               child: Column(
                 children: [
-                  CustomButton(
-                    text: 'Добавить деталь в заказ',
-                    onPressed: _openQuantity,
-                  ),
+                  CustomButton(text: 'Добавить деталь в заказ', onPressed: _openQuantity),
                   const SizedBox(height: 12),
                   CustomButton(
                     text: 'Посмотреть заказ',
                     onPressed: () async {
                       await Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => OrderSummaryScreen(orderNumber: 'Заказ №25', initialItems: items),
-                        ),
+                        MaterialPageRoute(builder: (_) => OrderSummaryScreen(orderNumber: 'Заказ №25', initialItems: items)),
                       );
                       setState(() {});
                     },
@@ -127,12 +115,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       ),
       bottomNavigationBar: AppBottomNav(
         currentIndex: 0,
-        onTap: (i) {
-          if (i == 0) return;
-          if (i == 3) {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MechanicProfileScreen()));
-          }
-        },
+        onTap: (i) => BottomNavDirect.go(context, 0, i),
       ),
     );
   }
@@ -140,11 +123,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget _laneDropdown() {
     return Container(
       height: 48,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.lightGray),
-      ),
+      decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.lightGray)),
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -161,9 +140,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   void _openQuantity() async {
     final qty = await showDialog<int>(context: context, builder: (_) => const QuantityDialog());
     if (qty != null) {
-      setState(() {
-        items.add(OrderItem(title: 'Деталь №${items.length + 1}', qty: qty));
-      });
+      setState(() => items.add(OrderItem(title: 'Деталь №${items.length + 1}', qty: qty)));
     }
   }
 }
