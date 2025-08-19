@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/colors.dart';
+import '../../../../core/theme/text_styles.dart';
 
 class AdaptiveText extends StatelessWidget {
   final String text;
   final TextStyle? style;
-  final int maxLines;
+  final TextAlign align;
 
-  const AdaptiveText(this.text, {Key? key, this.style, this.maxLines = 1}) : super(key: key);
+  const AdaptiveText(
+      this.text, {
+        super.key,
+        this.style,
+        this.align = TextAlign.start,
+      });
 
   @override
   Widget build(BuildContext context) {
-    return FittedBox(
-      alignment: Alignment.centerLeft,
-      fit: BoxFit.scaleDown,
-      child: Text(text, style: style, maxLines: maxLines, overflow: TextOverflow.visible),
+    return Text(
+      text,
+      style: style ?? AppTextStyles.formInput.copyWith(color: AppColors.textDark),
+      textAlign: align,
+      softWrap: true,
     );
   }
 }
