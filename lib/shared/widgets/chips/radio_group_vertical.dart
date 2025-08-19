@@ -37,10 +37,10 @@ class RadioGroupVertical extends StatelessWidget {
                 Container(
                   padding: RadioChipStyle.padding,
                   decoration: BoxDecoration(
-                    color: AppColors.white,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(RadioChipStyle.borderRadius),
                     border: Border.all(
-                      color: isSelected ? AppColors.primary : AppColors.lightGray,
+                      color: isSelected ? AppColors.primary : Colors.grey.shade400,
                     ),
                   ),
                   child: Text(

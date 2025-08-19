@@ -1,151 +1,304 @@
 import 'package:flutter/material.dart';
-import '../../../../../../core/theme/colors.dart';
-import '../../../../../../core/theme/typography_extension.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../../core/theme/colors.dart';
+import '../../domain/mechanic_profile.dart';
+import '../../../../../shared/widgets/inputs/labeled_text_field.dart';
+import '../../../../../shared/widgets/chips/radio_group_horizontal.dart';
+import 'mechanic_profile_screen.dart' show EditFocus;
 
 class EditMechanicProfileScreen extends StatefulWidget {
   final String? mechanicId;
-  final dynamic initial;
-  final dynamic focus;
+  final MechanicProfile? initial;
+  final EditFocus focus;
 
   const EditMechanicProfileScreen({
-    super.key,
+    Key? key,
     this.mechanicId,
     this.initial,
-    this.focus,
-  });
+    this.focus = EditFocus.none,
+  }) : super(key: key);
 
   @override
   State<EditMechanicProfileScreen> createState() => _EditMechanicProfileScreenState();
 }
 
 class _EditMechanicProfileScreenState extends State<EditMechanicProfileScreen> {
-  final _name = TextEditingController();
+  final _fio = TextEditingController();
+  final _address = TextEditingController();
   final _phone = TextEditingController();
-  final _club = TextEditingController();
+  final _birth = TextEditingController();
 
-  late FocusNode _nameFocus;
-  late FocusNode _phoneFocus;
-  late FocusNode _clubFocus;
+  final List<TextEditingController> _clubCtrls = [];
+
+  final _fioFocus = FocusNode();
+  final _phoneFocus = FocusNode();
+  final _addrFocus = FocusNode();
+
+  String _status = 'Механик';
+  int _navIndex = 3;
 
   @override
   void initState() {
     super.initState();
-    _nameFocus = FocusNode();
-    _phoneFocus = FocusNode();
-    _clubFocus = FocusNode();
-    _applyInitial(widget.initial);
+
+    final p = widget.initial;
+    if (p != null) {
+      _fio.text = p.fullName;
+      _address.text = p.address;
+      _phone.text = p.phone;
+      _birth.text = DateFormat('dd.MM.yyyy').format(p.birthDate);
+      _status = p.status;
+      final clubs = (p.clubs.isEmpty ? [p.clubName] : p.clubs);
+      for (final c in clubs) {
+        _clubCtrls.add(TextEditingController(text: c));
+      }
+    } else {
+      _clubCtrls.add(TextEditingController());
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final f = widget.focus;
-      if (f is String) {
-        switch (f.toLowerCase()) {
-          case 'name':
-          case 'fio':
-          case 'fullname':
-            _nameFocus.requestFocus();
-            break;
-          case 'phone':
-            _phoneFocus.requestFocus();
-            break;
-          case 'club':
-          case 'workplace':
-          case 'currentclub':
-            _clubFocus.requestFocus();
-            break;
-        }
-      } else if (f is FocusNode) {
-        f.requestFocus();
+      switch (widget.focus) {
+        case EditFocus.name:
+          _fioFocus.requestFocus();
+          break;
+        case EditFocus.phone:
+          _phoneFocus.requestFocus();
+          break;
+        case EditFocus.address:
+          _addrFocus.requestFocus();
+          break;
+        case EditFocus.none:
+          break;
       }
     });
   }
 
-  void _applyInitial(dynamic initial) {
-    Map<String, dynamic>? map;
-    if (initial is Map<String, dynamic>) {
-      map = initial;
-    } else {
-      try {
-        final j = initial?.toJson();
-        if (j is Map<String, dynamic>) map = j;
-      } catch (_) {}
-    }
-    if (map != null) {
-      _name.text = _pick(map, ['fullName', 'fio', 'name']) ?? _name.text;
-      _phone.text = _pick(map, ['phone']) ?? _phone.text;
-      _club.text = _pick(map, ['club', 'workplace', 'currentClub']) ?? _club.text;
-    }
-  }
-
-  String? _pick(Map<String, dynamic> m, List<String> keys) {
-    for (final k in keys) {
-      final v = m[k];
-      if (v is String && v.trim().isNotEmpty) return v;
-    }
-    return null;
-  }
-
   @override
   void dispose() {
-    _name.dispose();
+    _fio.dispose();
+    _address.dispose();
     _phone.dispose();
-    _club.dispose();
-    _nameFocus.dispose();
+    _birth.dispose();
+    for (final c in _clubCtrls) c.dispose();
+    _fioFocus.dispose();
     _phoneFocus.dispose();
-    _clubFocus.dispose();
+    _addrFocus.dispose();
     super.dispose();
+  }
+
+  InputDecoration _dec({String? hint, Color? fill}) {
+    return InputDecoration(
+      hintText: hint,
+      filled: true,
+      fillColor: fill ?? AppColors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.lightGray),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.lightGray),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.2),
+      ),
+    );
+  }
+
+  void _addClubField() {
+    setState(() => _clubCtrls.add(TextEditingController()));
+  }
+
+  void _removeClubField(int i) {
+    if (_clubCtrls.length <= 1) return;
+    setState(() {
+      final ctrl = _clubCtrls.removeAt(i);
+      ctrl.dispose();
+    });
+  }
+
+  Future<void> _pickBirth() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: now.subtract(const Duration(days: 365 * 25)),
+      firstDate: DateTime(1900),
+      lastDate: now,
+      helpText: 'Выберите дату рождения',
+    );
+    if (picked != null) {
+      _birth.text = DateFormat('dd.MM.yyyy').format(picked);
+    }
+  }
+
+  void _saveAndPop() {
+    if (widget.initial == null) {
+      Navigator.pop(context);
+      return;
+    }
+    final clubs = _clubCtrls.map((c) => c.text.trim()).where((s) => s.isNotEmpty).toList();
+    final clubName = clubs.isNotEmpty ? clubs.first : '';
+    final updated = widget.initial!.copyWith(
+      fullName: _fio.text.trim(),
+      address: _address.text.trim(),
+      phone: _phone.text.trim(),
+      clubName: clubName,
+      clubs: clubs,
+      status: _status,
+      birthDate: DateFormat('dd.MM.yyyy').parse(_birth.text),
+    );
+    Navigator.pop(context, updated);
   }
 
   @override
   Widget build(BuildContext context) {
-    final t = context.typo;
-
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Профиль механика', style: t.sectionTitle),
+        elevation: 0,
+        backgroundColor: AppColors.background,
+        leading: IconButton(
+          onPressed: _saveAndPop,
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textDark),
+        ),
+        title: const Text(
+          'Персональная информация',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textDark),
+        ),
+        centerTitle: false,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
-          Text('Основное', style: t.mainWelcomeTitle.copyWith(fontSize: 24)),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _name,
-            focusNode: _nameFocus,
-            decoration: const InputDecoration(labelText: 'ФИО'),
+          const SizedBox(height: 6),
+          const Text(
+            'Для редактирования информации нажмите на поле ввода',
+            style: TextStyle(fontSize: 13, color: AppColors.darkGray),
           ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _phone,
-            focusNode: _phoneFocus,
-            keyboardType: TextInputType.phone,
-            decoration: const InputDecoration(labelText: 'Телефон'),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _club,
-            focusNode: _clubFocus,
-            decoration: const InputDecoration(labelText: 'Клуб'),
-          ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {},
-                  child: const Text('Сохранить'),
-                ),
+          const SizedBox(height: 18),
+
+          const Text('ФИО', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
+          const SizedBox(height: 6),
+          TextField(controller: _fio, focusNode: _fioFocus, decoration: _dec()),
+          const SizedBox(height: 16),
+
+          const Text('Место работы', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
+          const SizedBox(height: 6),
+          ...List.generate(_clubCtrls.length, (i) {
+            final isLast = i == _clubCtrls.length - 1;
+            return Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
+              child: Row(
+                children: [
+                  Expanded(child: TextField(controller: _clubCtrls[i], decoration: _dec(hint: 'Боулинг клуб'))),
+                  const SizedBox(width: 8),
+                  if (_clubCtrls.length > 1)
+                    SizedBox(
+                      height: 48,
+                      width: 48,
+                      child: ElevatedButton(
+                        onPressed: () => _removeClubField(i),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.white,
+                          foregroundColor: AppColors.primary,
+                          elevation: 0,
+                          side: const BorderSide(color: AppColors.lightGray),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: EdgeInsets.zero,
+                        ),
+                        child: const Icon(Icons.remove),
+                      ),
+                    ),
+                ],
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Отмена'),
-                ),
+            );
+          }),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 48,
+            child: ElevatedButton(
+              onPressed: _addClubField,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.white,
+                foregroundColor: AppColors.primary,
+                elevation: 0,
+                side: const BorderSide(color: AppColors.lightGray),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-            ],
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.add),
+                  SizedBox(width: 8),
+                  Text('Добавить клуб'),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: 12),
-          if (widget.mechanicId != null)
-            Text('ID: ${widget.mechanicId}', style: t.formHint),
+
+          const Text('Адрес', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
+          const SizedBox(height: 6),
+          TextField(controller: _address, focusNode: _addrFocus, decoration: _dec(hint: 'г. Воронеж, ул. Тверская, д. 45')),
+          const SizedBox(height: 16),
+
+          const Text('Ваш статус:', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
+          const SizedBox(height: 8),
+          RadioGroupHorizontal(
+            options: const ['Собственник', 'Механик'],
+            groupValue: _status,
+            onChanged: (v) => setState(() => _status = v ?? _status),
+          ),
+          const SizedBox(height: 20),
+
+          const Text('Подтверждение', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
+          const SizedBox(height: 6),
+          SizedBox(
+            height: 48,
+            child: ElevatedButton(
+              onPressed: _saveAndPop,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.darkGray,
+                foregroundColor: AppColors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('Отправить запрос на подтверждение', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+            ),
+          ),
+          const SizedBox(height: 18),
+
+          const Text('Дата рождения', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
+          const SizedBox(height: 6),
+          TextField(controller: _birth, readOnly: true, onTap: _pickBirth, decoration: _dec()),
+          const SizedBox(height: 12),
+
+          const Text('Номер телефона', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
+          const SizedBox(height: 6),
+          TextField(controller: _phone, focusNode: _phoneFocus, readOnly: true, decoration: _dec(fill: const Color(0xFFF0DADF))),
+          const SizedBox(height: 8),
+
+          const Text(
+            'Чтобы изменить номер телефона, обратитесь в службу поддержки 8 800 000 00 00.',
+            style: TextStyle(fontSize: 13, color: AppColors.darkGray),
+          ),
+          const SizedBox(height: 28),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _navIndex,
+        onTap: (i) => setState(() => _navIndex = i),
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.darkGray,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'Заказы'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Поиск'),
+          BottomNavigationBarItem(icon: Icon(Icons.storefront_outlined), label: 'Клуб'),
+          BottomNavigationBarItem(icon: Icon(Icons.account_circle_outlined), label: 'Профиль'),
         ],
       ),
     );

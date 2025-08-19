@@ -39,14 +39,7 @@ class _StockSearchSheetState extends State<StockSearchSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            height: 4,
-            width: 44,
-            decoration: BoxDecoration(
-              color: AppColors.lightGray,
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
+          Container(height: 4, width: 44, decoration: BoxDecoration(color: const Color(0xFFE0E0E0), borderRadius: BorderRadius.circular(4))),
           const SizedBox(height: 16),
           SizedBox(
             height: 44,
@@ -57,18 +50,9 @@ class _StockSearchSheetState extends State<StockSearchSheet> {
                 hintText: 'Поиск по складу',
                 contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.refresh, color: AppColors.primary),
-                  onPressed: () => setState(() {}),
-                ),
+                focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AppColors.primary, width: 1.5), borderRadius: BorderRadius.circular(10)),
+                enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: AppColors.primary, width: 1.5), borderRadius: BorderRadius.circular(10)),
+                suffixIcon: IconButton(icon: const Icon(Icons.refresh), onPressed: () => setState(() {})),
               ),
             ),
           ),
@@ -88,21 +72,13 @@ class _StockSearchSheetState extends State<StockSearchSheet> {
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      color: AppColors.white,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: isAccent ? AppColors.primary : AppColors.lightGray,
-                        width: 1.5,
-                      ),
+                      border: Border.all(color: isAccent ? AppColors.primary : const Color(0xFFEDEDED), width: 1.5),
                     ),
                     child: Row(
                       children: [
-                        Expanded(
-                          child: Text(
-                            filtered[i],
-                            style: const TextStyle(fontSize: 14, color: AppColors.textDark),
-                          ),
-                        ),
+                        Expanded(child: Text(filtered[i], style: const TextStyle(fontSize: 14, color: AppColors.textDark))),
                         if (isAccent) const Icon(Icons.edit, size: 16, color: AppColors.primary),
                       ],
                     ),

@@ -40,9 +40,9 @@ class RadioGroupWrap extends StatelessWidget {
               Container(
                 padding: RadioChipStyle.padding,
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: Colors.white,
                   border: Border.all(
-                    color: isSelected ? AppColors.primary : AppColors.lightGray,
+                    color: isSelected ? AppColors.primary : Colors.grey.shade300,
                     width: 1.4,
                   ),
                   borderRadius: BorderRadius.circular(RadioChipStyle.borderRadius),
