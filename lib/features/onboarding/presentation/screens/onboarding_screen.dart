@@ -22,9 +22,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Future<void> _finish() async {
     final sp = await SharedPreferences.getInstance();
-    await sp.setBool('ftue_done', true);
+    await sp.setBool('first_run_done', true);
     if (!mounted) return;
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => WelcomeScreen()));
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const WelcomeScreen()));
   }
 
   Widget _buildIndicator() {
@@ -35,8 +35,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 6),
           padding: isActive ? const EdgeInsets.all(3) : EdgeInsets.zero,
-          decoration: isActive ? BoxDecoration(shape: BoxShape.circle, border: Border.all(color: AppColors.primary, width: 2)) : null,
-          child: Container(width: 12, height: 12, decoration: BoxDecoration(color: isActive ? AppColors.primary : AppColors.darkGray, shape: BoxShape.circle)),
+          decoration: isActive
+              ? BoxDecoration(shape: BoxShape.circle, border: Border.all(color: AppColors.primary, width: 2))
+              : null,
+          child: Container(
+            width: 12,
+            height: 12,
+            decoration: BoxDecoration(
+              color: isActive ? AppColors.primary : AppColors.darkGray,
+              shape: BoxShape.circle,
+            ),
+          ),
         );
       }),
     );
@@ -56,7 +65,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 padding: const EdgeInsets.only(right: 20, top: 10),
                 child: TextButton(
                   onPressed: _finish,
-                  child: const Text('Пропустить', style: TextStyle(fontFamily: 'Roboto', fontWeight: FontWeight.w500, fontSize: 16, color: Color(0xFFD7D7D7))),
+                  child: const Text(
+                    'Пропустить',
+                    style: TextStyle(
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                      color: Color(0xFFD7D7D7),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -80,7 +97,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 0.2126, 0.7152, 0.0722, 0, 0,
                                 0, 0, 0, 1, 0,
                               ]),
-                              child: Image.asset(_data[i]['image']!, width: 336, height: 438.45, fit: BoxFit.cover),
+                              child: Image.asset(
+                                _data[i]['image']!,
+                                width: 336,
+                                height: 438.45,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -89,9 +111,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             padding: const EdgeInsets.only(top: 24),
                             child: Column(
                               children: [
-                                SizedBox(width: screen.width * 0.9, child: Text(_data[i]['title']!, textAlign: TextAlign.center, style: AppTextStyles.onboardingTitle, softWrap: true)),
+                                SizedBox(
+                                  width: screen.width * 0.9,
+                                  child: Text(
+                                    _data[i]['title']!,
+                                    textAlign: TextAlign.center,
+                                    style: AppTextStyles.onboardingTitle,
+                                    softWrap: true,
+                                  ),
+                                ),
                                 const SizedBox(height: 16),
-                                SizedBox(width: screen.width * 0.95, child: Text(_data[i]['subtitle']!, textAlign: TextAlign.center, style: AppTextStyles.onboardingSubtitle, softWrap: true)),
+                                SizedBox(
+                                  width: screen.width * 0.95,
+                                  child: Text(
+                                    _data[i]['subtitle']!,
+                                    textAlign: TextAlign.center,
+                                    style: AppTextStyles.onboardingSubtitle,
+                                    softWrap: true,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -108,13 +146,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 width: 120,
                 height: 48,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(color: const Color(0xFFFCFCFD), borderRadius: BorderRadius.circular(16), boxShadow: const [BoxShadow(color: Color(0x1F0F0F0F), offset: Offset(0, 40), blurRadius: 32, spreadRadius: -24)]),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFCFCFD),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x1F0F0F0F),
+                      offset: Offset(0, 40),
+                      blurRadius: 32,
+                      spreadRadius: -24,
+                    )
+                  ],
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     GestureDetector(
-                      onTap: _index > 0 ? () => _controller.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut) : null,
-                      child: Opacity(opacity: _index > 0 ? 1.0 : 0.3, child: Icon(Icons.arrow_back_ios_new, color: AppColors.textDark, size: 20)),
+                      onTap: _index > 0
+                          ? () => _controller.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut)
+                          : null,
+                      child: Opacity(
+                        opacity: _index > 0 ? 1.0 : 0.3,
+                        child: Icon(Icons.arrow_back_ios_new, color: AppColors.textDark, size: 20),
+                      ),
                     ),
                     GestureDetector(
                       onTap: () {

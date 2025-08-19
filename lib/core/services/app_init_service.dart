@@ -1,50 +1,27 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../routing/routes.dart';
 import '../debug/test_overrides.dart';
+import '../routing/routes.dart';
 
 class AppInitService {
   Future<void> boot(BuildContext context) async {
-    var navigated = false;
+    final sp = await SharedPreferences.getInstance();
 
-    void go(String r) {
-      if (navigated || !context.mounted) return;
-      navigated = true;
-      Navigator.pushReplacementNamed(context, r);
+    if (TestOverrides.enabled) {
+      if (TestOverrides.forceFirstRun) {
+        await sp.setBool('first_run_done', false);
+      } else if (TestOverrides.forceSecondRun) {
+        await sp.setBool('first_run_done', true);
+      }
     }
 
-    Future.delayed(const Duration(seconds: 2), () {
-      if (!navigated && context.mounted) go(Routes.welcome);
-    });
+    final firstRunDone = sp.getBool('first_run_done') ?? false;
 
-    try {
-      final sp = await SharedPreferences.getInstance();
-
-      if (TestOverrides.enabled) {
-        if (TestOverrides.forceFirstRun) await sp.setBool('first_run_done', false);
-        if (TestOverrides.forceSecondRun) await sp.setBool('first_run_done', true);
-        if (TestOverrides.forceLoggedIn) await sp.setBool('logged_in', true);
-        if (TestOverrides.forceLoggedOut) await sp.setBool('logged_in', false);
-        if (TestOverrides.forceRole.isNotEmpty) await sp.setString('user_role', TestOverrides.forceRole);
-      }
-
-      final firstRunDone = sp.getBool('first_run_done') ?? false;
-      final loggedIn = sp.getBool('logged_in') ?? false;
-      final role = sp.getString('user_role') ?? 'mechanic';
-
-      if (!firstRunDone) {
-        go(Routes.splashFirstTime);
-        return;
-      }
-      if (loggedIn) {
-        go(role == 'owner' ? Routes.club : Routes.profileMechanic);
-        return;
-      }
-      go(Routes.welcome);
-    } catch (e, st) {
-      if (kDebugMode) debugPrint('AppInitService error: $e\n$st');
-      go(Routes.welcome);
+    if (!context.mounted) return;
+    if (!firstRunDone) {
+      Navigator.pushReplacementNamed(context, Routes.splashFirstTime);
+    } else {
+      Navigator.pushReplacementNamed(context, Routes.welcome);
     }
   }
 
@@ -53,5 +30,15 @@ class AppInitService {
     await sp.setBool('first_run_done', true);
     if (!context.mounted) return;
     Navigator.pushReplacementNamed(context, Routes.welcome);
+  }
+
+  static Future<bool> isFirstRun() async {
+    final sp = await SharedPreferences.getInstance();
+    return !(sp.getBool('first_run_done') ?? false);
+  }
+
+  static Future<void> setFirstRun(bool value) async {
+    final sp = await SharedPreferences.getInstance();
+    await sp.setBool('first_run_done', !value ? true : false);
   }
 }

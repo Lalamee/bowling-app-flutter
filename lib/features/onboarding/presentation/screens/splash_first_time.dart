@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/colors.dart';
+import '../../../../shared/widgets/titles/bowling_market_title.dart';
 import 'onboarding_screen.dart';
 
 class SplashFirstTime extends StatefulWidget {
@@ -13,7 +14,10 @@ class _SplashFirstTimeState extends State<SplashFirstTime> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const OnboardingScreen()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+      );
     });
   }
 
@@ -25,20 +29,23 @@ class _SplashFirstTimeState extends State<SplashFirstTime> {
         child: Column(
           children: [
             const Spacer(),
-            Image.asset('assets/images/logo_bowling_market.png', height: 72),
+            const BowlingMarketTitle(fontSize: 32),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text(
                 'Всё для эффективного управления и обслуживания боулинга — от механиков до собственников',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: AppColors.darkGray),
+                style: const TextStyle(fontSize: 12, color: AppColors.darkGray),
               ),
             ),
             const Spacer(),
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
-              child: Text('Version 1.0', style: TextStyle(fontSize: 11, color: AppColors.darkGray)),
+              child: Text(
+                'Version 1.0',
+                style: const TextStyle(fontSize: 11, color: AppColors.darkGray),
+              ),
             ),
           ],
         ),

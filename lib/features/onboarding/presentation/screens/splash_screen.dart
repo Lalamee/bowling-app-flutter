@@ -1,12 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../core/theme/colors.dart';
-import 'onboarding_screen.dart';
-import 'welcome_screen.dart';
-import '../../../../shared/widgets/titles/bowling_market_title.dart';
+import '../../../../../core/debug/test_overrides.dart';
+import '../../../../../core/routing/routes.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
+
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
@@ -15,35 +15,34 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _decideRoute();
+    _boot();
   }
 
-  Future<void> _decideRoute() async {
-    await Future.delayed(const Duration(seconds: 3));
+  Future<void> _boot() async {
     final sp = await SharedPreferences.getInstance();
-    final ftueDone = sp.getBool('ftue_done') ?? false;
+
+    if (TestOverrides.enabled) {
+      if (TestOverrides.forceFirstRun) {
+        await sp.setBool('first_run_done', false);
+      } else if (TestOverrides.forceSecondRun) {
+        await sp.setBool('first_run_done', true);
+      }
+    }
+
+    final firstRunDone = sp.getBool('first_run_done') ?? false;
+
     if (!mounted) return;
-    if (ftueDone) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => WelcomeScreen()));
+    if (!firstRunDone) {
+      Navigator.pushReplacementNamed(context, Routes.splashFirstTime);
     } else {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const OnboardingScreen()));
+      Navigator.pushReplacementNamed(context, Routes.welcome);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset('assets/images/splash.jpg', fit: BoxFit.cover),
-          ),
-          const Center(
-            child: BowlingMarketTitle(fontSize: 28),
-          ),
-        ],
-      ),
+    return const Scaffold(
+      body: Center(child: CircularProgressIndicator()),
     );
   }
 }
