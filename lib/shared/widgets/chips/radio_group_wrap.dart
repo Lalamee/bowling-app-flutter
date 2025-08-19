@@ -34,15 +34,15 @@ class RadioGroupWrap extends StatelessWidget {
                 groupValue: groupValue,
                 onChanged: (val) => onChanged(val!),
                 activeColor: AppColors.primary,
-                visualDensity: const VisualDensity(horizontal: -4, vertical: -4), 
+                visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               Container(
                 padding: RadioChipStyle.padding,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   border: Border.all(
-                    color: isSelected ? AppColors.primary : Colors.grey.shade300,
+                    color: isSelected ? AppColors.primary : AppColors.lightGray,
                     width: 1.4,
                   ),
                   borderRadius: BorderRadius.circular(RadioChipStyle.borderRadius),

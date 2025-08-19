@@ -19,15 +19,31 @@ class OrderInfoSheet extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Expanded(child: Text('Дорожка 1', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF23262F)))),
+                  const Expanded(
+                    child: Text(
+                      'Дорожка 1',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                  ),
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.close, size: 22, color: Color(0xFF6F6F6F)),
+                    child: const Icon(Icons.close, size: 22, color: AppColors.darkGray),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              const Text('Технические характеристики:', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF23262F))),
+              const Text(
+                'Технические характеристики:',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textDark,
+                ),
+              ),
               const SizedBox(height: 8),
               const _Bullet('модель'),
               const _Bullet('год выпуска'),
@@ -36,7 +52,14 @@ class OrderInfoSheet extends StatelessWidget {
               const _Bullet('Ещё какая-то информация'),
               const _Bullet('Много информации'),
               const SizedBox(height: 16),
-              const Text('Комментарии', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF23262F))),
+              const Text(
+                'Комментарии',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                ),
+              ),
               const SizedBox(height: 12),
               _comment('06.08.2025 - необходимо заменить деталь'),
               _comment('01.02.2025 - установлен новую деталь'),
@@ -72,7 +95,10 @@ class OrderInfoSheet extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.lightGray),
       ),
-      child: Text(text, style: const TextStyle(fontSize: 14, color: Color(0xFF23262F))),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 14, color: AppColors.textDark),
+      ),
     );
   }
 }
@@ -88,8 +114,13 @@ class _Bullet extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('• ', style: TextStyle(fontSize: 14, color: Color(0xFF23262F))),
-          Expanded(child: Text(text, style: const TextStyle(fontSize: 14, color: Color(0xFF23262F)))),
+          const Text('• ', style: TextStyle(fontSize: 14, color: AppColors.textDark)),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 14, color: AppColors.textDark),
+            ),
+          ),
         ],
       ),
     );

@@ -12,7 +12,6 @@ import '../../../../../core/utils/validators.dart';
 import '../../../../../core/utils/form_navigation.dart';
 import '../../../../../core/services/auth_service.dart';
 
-
 class RegisterMechanicScreen extends StatefulWidget {
   const RegisterMechanicScreen({Key? key}) : super(key: key);
 
@@ -65,14 +64,33 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
     }
   }
 
+  void _showBar(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), backgroundColor: AppColors.primary),
+    );
+  }
+
+  void _nextStepGuarded() {
+    // step: 0 -> личные данные, 1 -> образование, 2 -> стаж/статус
+    if (!(formKey.currentState?.validate() ?? false)) return;
+
+    if (step == 1 && (educationLevelId == null || educationLevelId!.isEmpty)) {
+      _showBar('Выберите уровень образования');
+      return;
+    }
+
+    if (step == 2 && (status == null || status!.isEmpty)) {
+      _showBar('Выберите статус');
+      return;
+    }
+
+    nextStep();
+  }
+
   Future<void> _submit() async {
     if (!formKey.currentState!.validate() || educationLevelId == null || status == null) {
-      if (educationLevelId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Выберите уровень образования')));
-      }
-      if (status == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Выберите статус')));
-      }
+      if (educationLevelId == null) _showBar('Выберите уровень образования');
+      if (status == null) _showBar('Выберите статус');
       return;
     }
 
@@ -104,15 +122,17 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
     final success = await AuthService.registerMechanic(data);
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Регистрация механика успешна')));
+      _showBar('Регистрация механика успешна');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ошибка при отправке данных')));
+      _showBar('Ошибка при отправке данных');
     }
   }
 
   @override
   Widget build(BuildContext ctx) {
     final steps = [_buildStepOne(ctx), _buildStepTwo(ctx), _buildStepThree(ctx)];
+    final isLast = step == steps.length - 1;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -129,9 +149,9 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
             ),
             Padding(
               padding: const EdgeInsets.all(24),
-              child: step == steps.length - 1
+              child: isLast
                   ? CustomButton(text: 'Зарегистрироваться', onPressed: _submit)
-                  : CustomButton(text: 'Далее', onPressed: nextStep),
+                  : CustomButton(text: 'Далее', onPressed: _nextStepGuarded),
             ),
           ],
         ),
@@ -143,30 +163,12 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.arrow_back)),
+        IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.arrow_back, color: AppColors.primary)),
         formStepTitle('Добро пожаловать!'),
         formDescription('Пожалуйста, заполните форму — это нужно, чтобы мы знали, где вы работаете и могли подключить Вас к системе.'),
-        LabeledTextField(
-          label: 'ФИО',
-          controller: _fio,
-          validator: Validators.notEmpty,
-          icon: Icons.person,
-        ),
-        LabeledTextField(
-          label: 'Дата рождения',
-          controller: _birth,
-          validator: Validators.birth(birthDate),
-          readOnly: true,
-          onTap: _pickBirthDate,
-          icon: Icons.calendar_today,
-        ),
-        LabeledTextField(
-          label: 'Номер телефона',
-          controller: _phone,
-          validator: Validators.phone,
-          keyboardType: TextInputType.phone,
-          icon: Icons.phone,
-        ),
+        LabeledTextField(label: 'ФИО', controller: _fio, validator: Validators.notEmpty, icon: Icons.person),
+        LabeledTextField(label: 'Дата рождения', controller: _birth, validator: Validators.birth(birthDate), readOnly: true, onTap: _pickBirthDate, icon: Icons.calendar_today),
+        LabeledTextField(label: 'Номер телефона', controller: _phone, validator: Validators.phone, keyboardType: TextInputType.phone, icon: Icons.phone),
       ],
     );
   }
@@ -175,31 +177,17 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        IconButton(onPressed: prevStep, icon: const Icon(Icons.arrow_back)),
+        IconButton(onPressed: prevStep, icon: const Icon(Icons.arrow_back, color: AppColors.primary)),
         sectionTitle('Какое у Вас образование?'),
         const SizedBox(height: 16),
         RadioGroupWrap(
-          options: const [
-            'высшее',
-            'высшее-профессиональное',
-            'среднее',
-            'средне-профессиональное',
-            'другое',
-          ],
+          options: const ['высшее', 'высшее-профессиональное', 'среднее', 'средне-профессиональное', 'другое'],
           groupValue: educationLevelId,
           onChanged: (v) => setState(() => educationLevelId = v!.split(':')[0]),
         ),
         const SizedBox(height: 16),
-        LabeledTextField(
-          label: 'Наименование образовательного учреждения',
-          controller: _educationName,
-          validator: Validators.notEmpty,
-        ),
-        LabeledTextField(
-          label: 'Дополнительное образование (курсы и т.д.)',
-          controller: _extraEducation,
-          validator: Validators.notEmpty,
-        ),
+        LabeledTextField(label: 'Наименование образовательного учреждения', controller: _educationName, validator: Validators.notEmpty),
+        LabeledTextField(label: 'Дополнительное образование (курсы и т.д.)', controller: _extraEducation, validator: Validators.notEmpty),
       ],
     );
   }
@@ -208,15 +196,10 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        IconButton(onPressed: prevStep, icon: const Icon(Icons.arrow_back)),
+        IconButton(onPressed: prevStep, icon: const Icon(Icons.arrow_back, color: AppColors.primary)),
         sectionTitle('Стаж работы'),
         const SizedBox(height: 8),
-        LabeledTextField(
-          label: 'Общий стаж работы',
-          controller: _workYears,
-          validator: Validators.integer,
-          keyboardType: TextInputType.number,
-        ),
+        LabeledTextField(label: 'Общий стаж работы', controller: _workYears, validator: Validators.integer, keyboardType: TextInputType.number),
         LabeledTextField(
           label: 'Стаж в боулинге',
           controller: _bowlingYears,
@@ -227,21 +210,9 @@ class _RegisterMechanicScreenState extends MultiStepFormState<RegisterMechanicSc
           },
           keyboardType: TextInputType.number,
         ),
-        LabeledTextField(
-          label: 'Текущее место работы',
-          controller: _currentClub,
-          validator: Validators.notEmpty,
-        ),
-        LabeledTextField(
-          label: 'Где и когда работали в боулинге',
-          controller: _bowlingHistory,
-          validator: Validators.bowlingHistoryFormat,
-        ),
-        LabeledTextField(
-          label: 'Навыки и преимущества',
-          controller: _skills,
-          validator: Validators.notEmpty,
-        ),
+        LabeledTextField(label: 'Текущее место работы', controller: _currentClub, validator: Validators.notEmpty),
+        LabeledTextField(label: 'Где и когда работали в боулинге', controller: _bowlingHistory, validator: Validators.bowlingHistoryFormat),
+        LabeledTextField(label: 'Навыки и преимущества', controller: _skills, validator: Validators.notEmpty),
         const SizedBox(height: 16),
         formDescription('Ваш статус:'),
         RadioGroupHorizontal(

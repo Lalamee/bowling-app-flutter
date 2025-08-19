@@ -8,15 +8,17 @@ class MiniAddButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: 28,
-        height: 28,
+        width: 36,
+        height: 36,
         decoration: BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.lightGray),
+          boxShadow: const [BoxShadow(color: AppColors.shadowSoft, blurRadius: 6, offset: Offset(0, 2))],
         ),
         alignment: Alignment.center,
         child: const Icon(Icons.add, color: AppColors.primary, size: 18),

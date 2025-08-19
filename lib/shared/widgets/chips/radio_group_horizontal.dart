@@ -40,15 +40,15 @@ class RadioGroupHorizontal extends StatelessWidget {
                   height: 29,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: isSelected ? AppColors.primary : Colors.grey.shade400,
+                      color: isSelected ? AppColors.primary : AppColors.lightGray,
                       width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: AppColors.shadowSoft,
                         blurRadius: 3,
                         offset: const Offset(0, 1),
                       ),

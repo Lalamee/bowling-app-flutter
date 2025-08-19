@@ -1,3 +1,4 @@
+// lib/features/shared/widgets/nav/app_bottom_nav.dart
 import 'package:flutter/material.dart';
 import '../../../core/theme/colors.dart';
 
@@ -17,7 +18,9 @@ class AppBottomNav extends StatelessWidget {
       currentIndex: currentIndex,
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
+      backgroundColor: AppColors.white,
       selectedItemColor: AppColors.primary,
+      unselectedItemColor: AppColors.darkGray,
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'Заказы'),
         BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Поиск'),

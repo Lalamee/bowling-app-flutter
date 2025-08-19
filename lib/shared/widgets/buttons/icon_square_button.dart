@@ -18,6 +18,7 @@ class IconSquareButton extends StatelessWidget {
           color: AppColors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: AppColors.lightGray),
+          boxShadow: const [BoxShadow(color: AppColors.shadowSoft, blurRadius: 6, offset: Offset(0, 2))],
         ),
         alignment: Alignment.center,
         child: Icon(icon, color: AppColors.textDark, size: 20),

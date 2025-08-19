@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/text_styles.dart';
+import '../../../core/theme/colors.dart';
 import '../buttons/custom_button.dart';
 
 class CommonUI {
   static const double radius = 16;
 
   static BoxDecoration cardDecoration({
-    Color color = Colors.white,
+    Color color = AppColors.white,
     double blur = 8,
     double spread = 0,
     Offset offset = const Offset(0, 2),
-    Color shadow = const Color(0x0F000000),
+    Color shadow = AppColors.shadowSoft,
   }) {
     return BoxDecoration(
       color: color,
@@ -23,7 +24,7 @@ class CommonUI {
     required Widget child,
     EdgeInsets? padding,
     EdgeInsets? margin,
-    Color color = Colors.white,
+    Color color = AppColors.white,
   }) {
     return Container(
       margin: margin,

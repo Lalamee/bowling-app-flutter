@@ -7,12 +7,7 @@ class AdaptiveText extends StatelessWidget {
   final TextStyle? style;
   final TextAlign align;
 
-  const AdaptiveText(
-      this.text, {
-        super.key,
-        this.style,
-        this.align = TextAlign.start,
-      });
+  const AdaptiveText(this.text, {super.key, this.style, this.align = TextAlign.start});
 
   @override
   Widget build(BuildContext context) {

@@ -6,8 +6,8 @@ class ProfileTile extends StatelessWidget {
   final String text;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
-  final bool danger;          
-  final bool showAlertBadge;  
+  final bool danger;
+  final bool showAlertBadge;
 
   const ProfileTile({
     Key? key,
@@ -24,7 +24,7 @@ class ProfileTile extends StatelessWidget {
     final baseStyle = TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.w500,
-      color: danger ? const Color(0xFFEB003B) : const Color(0xFF1C1C1E),
+      color: danger ? const Color(0xFFEB003B) : AppColors.textDark,
       height: 1.2,
     );
 
@@ -34,8 +34,8 @@ class ProfileTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: const Color(0xFFE9E9E9)),
+          color: AppColors.white,
+          border: Border.all(color: AppColors.lightGray),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Row(
@@ -44,7 +44,7 @@ class ProfileTile extends StatelessWidget {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: const Color(0xFFF7F7F7),
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, size: 18, color: AppColors.primary),
@@ -68,7 +68,7 @@ class ProfileTile extends StatelessWidget {
                   color: Color(0xFFEB003B),
                   shape: BoxShape.circle,
                 ),
-                child: const Text('!', style: TextStyle(color: Colors.white, fontSize: 12)),
+                child: const Text('!', style: TextStyle(color: AppColors.white, fontSize: 12)),
               ),
             ],
             if (onEdit != null) ...[

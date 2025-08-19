@@ -42,7 +42,7 @@ class _LabeledTextFieldState extends State<LabeledTextField> {
   bool get isPhone => widget.keyboardType == TextInputType.phone;
   bool get isINN =>
       widget.keyboardType == TextInputType.number &&
-      widget.label.toLowerCase().contains('инн');
+          widget.label.toLowerCase().contains('инн');
 
   @override
   void initState() {
@@ -124,11 +124,11 @@ class _LabeledTextFieldState extends State<LabeledTextField> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(12.84),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: AppColors.black.withOpacity(0.05),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -155,8 +155,10 @@ class _LabeledTextFieldState extends State<LabeledTextField> {
                     borderRadius: BorderRadius.circular(12.84),
                   ),
                   contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                   errorText: null,
+                  fillColor: AppColors.white,
+                  filled: true,
                 ),
                 style: AppTextStyles.formInput,
                 onChanged: _onChanged,

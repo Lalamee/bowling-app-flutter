@@ -1,3 +1,4 @@
+// lib/features/shared/widgets/layout/section_list.dart
 import 'package:flutter/material.dart';
 import '../../../core/theme/colors.dart';
 import 'common_ui.dart';
@@ -16,38 +17,35 @@ class SectionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CommonUI.card(
-      padding: const EdgeInsets.all(12),
+    return Container(
+      decoration: CommonUI.cardDecoration(color: AppColors.white),
       child: Column(
-        children: List.generate(items.length, (i) {
-          final isActive = i == selected;
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: InkWell(
-              onTap: () => onSelect(i),
-              borderRadius: BorderRadius.circular(10),
-              child: Container(
-                height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: isActive ? AppColors.primary : AppColors.lightGray, width: 1.5),
+        children: List.generate(items.length, (index) {
+          final isActive = index == selected;
+          return InkWell(
+            onTap: () => onSelect(index),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: index == items.length - 1 ? Colors.transparent : AppColors.lightGray,
+                  ),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  children: [
-                    Text(
-                      items[i],
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: isActive ? AppColors.textDark : AppColors.darkGray,
-                      ),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    items[index],
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: isActive ? AppColors.primary : AppColors.textDark,
                     ),
-                    const Spacer(),
-                    Icon(Icons.keyboard_arrow_down, color: isActive ? AppColors.primary : AppColors.darkGray),
-                  ],
-                ),
+                  ),
+                  const Spacer(),
+                  Icon(Icons.keyboard_arrow_down, color: isActive ? AppColors.primary : AppColors.darkGray),
+                ],
               ),
             ),
           );

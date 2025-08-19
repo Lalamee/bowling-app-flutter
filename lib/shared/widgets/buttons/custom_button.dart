@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/colors.dart';
+import '../../../core/theme/typography_extension.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -15,23 +16,27 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isOutlined) {
-      return OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          backgroundColor: AppColors.white,
-          foregroundColor: AppColors.textDark,
-          side: const BorderSide(color: AppColors.lightGray),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        ),
-        child: Text(
-          text,
-          style: const TextStyle(fontSize: 16, color: AppColors.textDark),
-        ),
-      );
-    }
+    return isOutlined ? _buildOutlined(context) : _buildFilled(context);
+  }
 
+  Widget _buildOutlined(BuildContext context) {
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        side: const BorderSide(color: AppColors.primary, width: 1.5),
+        foregroundColor: AppColors.primary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        backgroundColor: AppColors.white,
+      ),
+      child: Text(
+        text,
+        style: context.typo.formLabel.copyWith(color: AppColors.primary),
+      ),
+    );
+  }
+
+  Widget _buildFilled(BuildContext context) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
@@ -39,10 +44,12 @@ class CustomButton extends StatelessWidget {
         foregroundColor: AppColors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        shadowColor: AppColors.shadowSoft,
+        elevation: 1,
       ),
       child: Text(
         text,
-        style: const TextStyle(fontSize: 16, color: AppColors.white),
+        style: context.typo.formLabel.copyWith(color: AppColors.white),
       ),
     );
   }

@@ -11,7 +11,6 @@ import '../../../../../core/utils/validators.dart';
 import '../../../../../core/utils/form_navigation.dart';
 import '../../../../../core/services/auth_service.dart';
 
-
 class RegisterOwnerScreen extends StatefulWidget {
   const RegisterOwnerScreen({Key? key}) : super(key: key);
 
@@ -40,14 +39,28 @@ class _RegisterOwnerScreenState extends MultiStepFormState<RegisterOwnerScreen> 
     super.dispose();
   }
 
+  void _showBar(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), backgroundColor: AppColors.primary),
+    );
+  }
+
+  void _nextStepGuarded() {
+    // step: 0 -> данные владельца/статус, 1 -> клуб/оборудование
+    if (!(formKey.currentState?.validate() ?? false)) return;
+
+    if (step == 0 && (status == null || status!.isEmpty)) {
+      _showBar('Выберите статус');
+      return;
+    }
+
+    nextStep();
+  }
+
   void _submit() async {
     if (!formKey.currentState!.validate() || status == null || selectedEquipment == null) {
-      if (status == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Выберите статус')));
-      }
-      if (selectedEquipment == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Выберите оборудование')));
-      }
+      if (status == null) _showBar('Выберите статус');
+      if (selectedEquipment == null) _showBar('Выберите оборудование');
       return;
     }
 
@@ -64,15 +77,16 @@ class _RegisterOwnerScreenState extends MultiStepFormState<RegisterOwnerScreen> 
     final success = await AuthService.registerOwner(data);
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Регистрация владельца выполнена')));
+      _showBar('Регистрация владельца выполнена');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ошибка регистрации')));
+      _showBar('Ошибка регистрации');
     }
   }
 
   @override
   Widget build(BuildContext ctx) {
     final steps = [_buildStepOne(ctx), _buildStepTwo(ctx)];
+    final isLast = step == steps.length - 1;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -90,9 +104,9 @@ class _RegisterOwnerScreenState extends MultiStepFormState<RegisterOwnerScreen> 
             ),
             Padding(
               padding: const EdgeInsets.all(24),
-              child: step == steps.length - 1
+              child: isLast
                   ? CustomButton(text: 'Зарегистрироваться', onPressed: _submit)
-                  : CustomButton(text: 'Далее', onPressed: nextStep),
+                  : CustomButton(text: 'Далее', onPressed: _nextStepGuarded),
             ),
           ],
         ),
@@ -104,7 +118,7 @@ class _RegisterOwnerScreenState extends MultiStepFormState<RegisterOwnerScreen> 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.arrow_back)),
+        IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.arrow_back, color: AppColors.primary)),
         formStepTitle('Добро пожаловать!'),
         formDescription('Это нужно, чтобы мы знали, каким клубом вы управляете, и могли предоставить вам доступ к инструментам управления.'),
         LabeledTextField(label: 'ФИО', controller: _fio, validator: Validators.notEmpty, icon: Icons.person),
@@ -125,7 +139,7 @@ class _RegisterOwnerScreenState extends MultiStepFormState<RegisterOwnerScreen> 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        IconButton(onPressed: prevStep, icon: const Icon(Icons.arrow_back)),
+        IconButton(onPressed: prevStep, icon: const Icon(Icons.arrow_back, color: AppColors.primary)),
         sectionTitle('Расскажите о Вашем клубе:'),
         formDescription('Укажите количество дорожек и установленное оборудование.'),
         LabeledTextField(label: 'Название клуба', controller: _club, validator: Validators.notEmpty, icon: Icons.sports),
