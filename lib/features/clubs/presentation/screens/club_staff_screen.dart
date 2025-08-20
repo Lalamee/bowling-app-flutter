@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../../shared/widgets/chips/radio_group_horizontal.dart';
-import '../../../../shared/widgets/nav/app_bottom_nav.dart' as nav;
+import '../../../../shared/widgets/nav/app_bottom_nav.dart';
 import '../../../../core/routing/routes.dart';
 
 class ClubStaffScreen extends StatefulWidget {
@@ -24,13 +24,20 @@ class _ClubStaffScreenState extends State<ClubStaffScreen> {
     ),
   ];
 
-  InputDecoration _dec({String? hint, Color? fill, bool enabled = true}) {
+  InputDecoration _dec({
+    String? hint,
+    Color? fill,
+    bool enabled = true,
+    bool focusedRed = false,
+    Widget? suffix,
+  }) {
     return InputDecoration(
       hintText: hint,
       filled: true,
       enabled: enabled,
       fillColor: fill ?? AppColors.white,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      suffixIcon: suffix,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: AppColors.lightGray),
@@ -41,8 +48,17 @@ class _ClubStaffScreenState extends State<ClubStaffScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.primary, width: 1.2),
+        borderSide: BorderSide(color: focusedRed ? AppColors.primary : AppColors.primary, width: 1.4),
       ),
+    );
+  }
+
+  Widget _suffixEdit(VoidCallback onPressed) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: const Icon(Icons.edit_outlined, size: 18, color: AppColors.primary),
+      splashRadius: 20,
+      constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
     );
   }
 
@@ -51,7 +67,7 @@ class _ClubStaffScreenState extends State<ClubStaffScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _AssignEmployeeSheet(dec: _dec),
+      builder: (_) => _AssignEmployeeSheet(dec: _dec, suffixEdit: _suffixEdit),
     );
     if (result != null) {
       setState(() => _employees.add(result));
@@ -72,7 +88,7 @@ class _ClubStaffScreenState extends State<ClubStaffScreen> {
         Navigator.pushReplacementNamed(context, Routes.club);
         break;
       case 3:
-        Navigator.pushReplacementNamed(context, Routes.profileMechanic); // если будет профиль владельца — заменишь
+        Navigator.pushReplacementNamed(context, Routes.profileMechanic);
         break;
     }
   }
@@ -88,10 +104,10 @@ class _ClubStaffScreenState extends State<ClubStaffScreen> {
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textDark),
         ),
-        title: const Text('Сотрудники клуба', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textDark)),
+        title: const Text('Сотрудники клуба', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: AppColors.textDark)),
         centerTitle: false,
       ),
-      bottomNavigationBar: nav.AppBottomNav(currentIndex: _navIndex, onTap: _onNavTap),
+      bottomNavigationBar: AppBottomNav(currentIndex: _navIndex, onTap: _onNavTap),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
@@ -99,7 +115,7 @@ class _ClubStaffScreenState extends State<ClubStaffScreen> {
             height: 48,
             child: ElevatedButton.icon(
               onPressed: _openAssignSheet,
-              icon: const Icon(Icons.add),
+              icon: const Icon(Icons.add, color: AppColors.white),
               label: const Text('Назначить сотрудника'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.darkGray,
@@ -110,7 +126,14 @@ class _ClubStaffScreenState extends State<ClubStaffScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          ..._employees.map((e) => _EmployeeCard(employee: e, dec: _dec, onDelete: () => setState(() => _employees.remove(e)))),
+          ..._employees.map((e) => _EmployeeCard(
+            key: ValueKey(e.fio),
+            employee: e,
+            dec: _dec,
+            suffixEdit: _suffixEdit,
+            onDelete: () => setState(() => _employees.remove(e)),
+            onChangeRole: (v) => setState(() => e.role = v),
+          )),
         ],
       ),
     );
@@ -118,11 +141,11 @@ class _ClubStaffScreenState extends State<ClubStaffScreen> {
 }
 
 class _Employee {
-  final String fio;
-  final List<String> workplaces;
-  final String address;
-  final String phone;
-  final String role;
+  String fio;
+  List<String> workplaces;
+  String address;
+  String phone;
+  String role;
 
   _Employee({
     required this.fio,
@@ -133,40 +156,118 @@ class _Employee {
   });
 }
 
-class _EmployeeCard extends StatelessWidget {
+class _EmployeeCard extends StatefulWidget {
   final _Employee employee;
-  final InputDecoration Function({String? hint, Color? fill, bool enabled}) dec;
+  final InputDecoration Function({String? hint, Color? fill, bool enabled, bool focusedRed, Widget? suffix}) dec;
+  final Widget Function(VoidCallback onPressed) suffixEdit;
   final VoidCallback onDelete;
+  final ValueChanged<String> onChangeRole;
 
-  const _EmployeeCard({Key? key, required this.employee, required this.dec, required this.onDelete}) : super(key: key);
+  const _EmployeeCard({
+    Key? key,
+    required this.employee,
+    required this.dec,
+    required this.suffixEdit,
+    required this.onDelete,
+    required this.onChangeRole,
+  }) : super(key: key);
+
+  @override
+  State<_EmployeeCard> createState() => _EmployeeCardState();
+}
+
+class _EmployeeCardState extends State<_EmployeeCard> {
+  late final TextEditingController _fio;
+  late final TextEditingController _addr;
+  late final TextEditingController _phone;
+  late final List<TextEditingController> _works;
+
+  @override
+  void initState() {
+    super.initState();
+    _fio = TextEditingController(text: widget.employee.fio);
+    _addr = TextEditingController(text: widget.employee.address);
+    _phone = TextEditingController(text: widget.employee.phone);
+    _works = widget.employee.workplaces.map((w) => TextEditingController(text: w)).toList();
+  }
+
+  @override
+  void dispose() {
+    _fio.dispose();
+    _addr.dispose();
+    _phone.dispose();
+    for (final c in _works) c.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       color: AppColors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 0,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(decoration: dec(enabled: false), controller: TextEditingController(text: employee.fio), enabled: false),
-            const SizedBox(height: 10),
-            ...employee.workplaces.map((w) => Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: TextField(decoration: dec(enabled: false), controller: TextEditingController(text: w), enabled: false),
-            )),
-            TextField(decoration: dec(enabled: false), controller: TextEditingController(text: employee.address), enabled: false),
-            const SizedBox(height: 10),
-            TextField(decoration: dec(fill: const Color(0xFFF0DADF), enabled: false), controller: TextEditingController(text: employee.phone), enabled: false),
+            const Text('ФИО', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
+            const SizedBox(height: 6),
+            TextField(
+              controller: _fio,
+              decoration: widget.dec(focusedRed: true, suffix: widget.suffixEdit(() {})),
+            ),
+            const SizedBox(height: 16),
+            const Text('Место работы', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
+            const SizedBox(height: 6),
+            ...List.generate(_works.length, (i) {
+              final isLast = i == _works.length - 1;
+              return Padding(
+                padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
+                child: Row(
+                  children: [
+                    Expanded(child: TextField(controller: _works[i], decoration: widget.dec(hint: 'Боулинг клуб'))),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      height: 44,
+                      width: 44,
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: const BorderSide(color: AppColors.lightGray),
+                          ),
+                        ),
+                        child: const Icon(Icons.add, color: AppColors.textDark),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
             const SizedBox(height: 12),
+            TextField(controller: _addr, decoration: widget.dec(hint: 'г. Воронеж, ул. Тверская, д. 45')),
+            const SizedBox(height: 16),
+            const Text('Номер телефона', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
+            const SizedBox(height: 6),
+            TextField(controller: _phone, decoration: widget.dec(fill: const Color(0xFFF0DADF), suffix: widget.suffixEdit(() {}))),
+            const SizedBox(height: 16),
+            const Text('Статус:', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
+            const SizedBox(height: 8),
             Align(
               alignment: Alignment.centerLeft,
               child: RadioGroupHorizontal(
                 options: const ['Менеджер', 'Механик'],
-                groupValue: employee.role,
-                onChanged: (_) {},
+                groupValue: widget.employee.role,
+                onChanged: (v) {
+                  if (v == null) return;
+                  widget.onChangeRole(v);
+                  setState(() {});
+                },
               ),
             ),
             const SizedBox(height: 12),
@@ -174,7 +275,7 @@ class _EmployeeCard extends StatelessWidget {
               height: 48,
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: onDelete,
+                onPressed: widget.onDelete,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.white,
@@ -191,16 +292,17 @@ class _EmployeeCard extends StatelessWidget {
 }
 
 class _AssignEmployeeSheet extends StatefulWidget {
-  final InputDecoration Function({String? hint, Color? fill, bool enabled}) dec;
+  final InputDecoration Function({String? hint, Color? fill, bool enabled, bool focusedRed, Widget? suffix}) dec;
+  final Widget Function(VoidCallback onPressed) suffixEdit;
 
-  const _AssignEmployeeSheet({Key? key, required this.dec}) : super(key: key);
+  const _AssignEmployeeSheet({Key? key, required this.dec, required this.suffixEdit}) : super(key: key);
 
   @override
   State<_AssignEmployeeSheet> createState() => _AssignEmployeeSheetState();
 }
 
 class _AssignEmployeeSheetState extends State<_AssignEmployeeSheet> {
-  final _fio = TextEditingController();
+  final _fio = TextEditingController(text: 'Менеджер Иван Иванович');
   final _phone = TextEditingController(text: '+7 (980) 001 01 01');
   final List<TextEditingController> _work = [TextEditingController(text: 'Боулинг клуб "Кегли"')];
   String _role = 'Менеджер';
@@ -265,7 +367,7 @@ class _AssignEmployeeSheetState extends State<_AssignEmployeeSheet> {
             const SizedBox(height: 8),
             const Text('ФИО', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
             const SizedBox(height: 6),
-            TextField(controller: _fio, decoration: dec()),
+            TextField(controller: _fio, decoration: dec(focusedRed: true, suffix: widget.suffixEdit(() {}))),
             const SizedBox(height: 16),
             const Text('Место работы', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
             const SizedBox(height: 6),
@@ -279,19 +381,19 @@ class _AssignEmployeeSheetState extends State<_AssignEmployeeSheet> {
                     const SizedBox(width: 8),
                     if (_work.length > 1)
                       SizedBox(
-                        height: 48,
-                        width: 48,
+                        height: 44,
+                        width: 44,
                         child: ElevatedButton(
                           onPressed: () => _removeWork(i),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.white,
-                            foregroundColor: AppColors.primary,
                             elevation: 0,
-                            side: const BorderSide(color: AppColors.lightGray),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            padding: EdgeInsets.zero,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: const BorderSide(color: AppColors.lightGray),
+                            ),
                           ),
-                          child: const Icon(Icons.remove),
+                          child: const Icon(Icons.remove, color: AppColors.textDark),
                         ),
                       ),
                   ],
@@ -323,7 +425,7 @@ class _AssignEmployeeSheetState extends State<_AssignEmployeeSheet> {
             const SizedBox(height: 16),
             const Text('Номер телефона', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
             const SizedBox(height: 6),
-            TextField(controller: _phone, decoration: dec()),
+            TextField(controller: _phone, decoration: dec(suffix: widget.suffixEdit(() {}))),
             const SizedBox(height: 16),
             const Text('Ваш статус:', style: TextStyle(fontSize: 13, color: AppColors.darkGray)),
             const SizedBox(height: 8),
