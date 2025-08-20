@@ -17,9 +17,13 @@ import '../../features/orders/presentation/screens/order_summary_screen.dart';
 import '../../features/clubs/presentation/screens/club_screen.dart';
 import '../../features/clubs/presentation/screens/club_search_screen.dart';
 import '../../features/clubs/presentation/screens/club_warehouse_screen.dart';
+import '../../features/clubs/presentation/screens/club_staff_screen.dart';
 
 import '../../features/profile/mechanic/presentation/screens/mechanic_profile_screen.dart';
 import '../../features/profile/mechanic/presentation/screens/edit_mechanic_profile_screen.dart';
+
+import '../../features/profile/owner/presentation/screens/owner_profile_screen.dart';
+import '../../features/profile/owner/presentation/screens/edit_owner_profile_screen.dart';
 
 import '../../features/knowledge_base/presentation/screens/knowledge_base_screen.dart';
 import '../../features/knowledge_base/presentation/screens/pdf_reader_screen.dart';
@@ -43,6 +47,12 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const RegisterOwnerScreen());
       case Routes.orders:
         return MaterialPageRoute(builder: (_) => const OrdersScreen());
+      case Routes.profileOwner:
+        return MaterialPageRoute(builder: (_) => const OwnerProfileScreen());
+      case Routes.editOwnerProfile:
+        return MaterialPageRoute(builder: (_) => const EditOwnerProfileScreen());
+      case Routes.clubStaff:
+        return MaterialPageRoute(builder: (_) => const ClubStaffScreen());
       case Routes.orderSummary: {
         final args = settings.arguments as OrderSummaryArgs?;
         if (args == null) return MaterialPageRoute(builder: (_) => const OrdersScreen());

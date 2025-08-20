@@ -3,7 +3,9 @@ import 'package:flutter/gestures.dart';
 import 'register_role_selection.dart';
 import '../../../../shared/widgets/titles/bowling_market_title.dart';
 import '../../../../core/theme/colors.dart';
-import '../../../orders/presentation/screens/orders_screen.dart';
+
+import '../../../../../core/routing/routes.dart';
+import '../../../../../core/debug/test_overrides.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -18,16 +20,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   void initState() {
     super.initState();
-    _policyRecognizer = TapGestureRecognizer()
-      ..onTap = () {
-        // TODO: открыть экран/вебвью политики
-      };
+    _policyRecognizer = TapGestureRecognizer()..onTap = () {};
   }
 
   @override
   void dispose() {
     _policyRecognizer.dispose();
     super.dispose();
+  }
+
+  void _enter() {
+    final role = TestOverrides.userRole.toLowerCase();
+    if (role == 'owner') {
+      Navigator.pushReplacementNamed(context, Routes.profileOwner);
+    } else {
+      Navigator.pushReplacementNamed(context, Routes.profileMechanic);
+    }
   }
 
   @override
@@ -67,10 +75,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     height: 56,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => const OrdersScreen()),
-                        );
+                        if (TestOverrides.userRole.toLowerCase() == 'owner') {
+                          Navigator.pushReplacementNamed(context, Routes.profileOwner);
+                        } else {
+                          Navigator.pushReplacementNamed(context, Routes.profileMechanic);
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
@@ -80,9 +89,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           borderRadius: BorderRadius.circular(32),
                         ),
                       ),
-                      child: const Text('ВОЙТИ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                      child: const Text('ВОЙТИ',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                     ),
                   ),
+
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,

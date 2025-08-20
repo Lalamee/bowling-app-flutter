@@ -17,6 +17,10 @@ class Routes {
   static const profileMechanic = '/profile/mechanic';
   static const editMechanicProfile = '/profile/mechanic/edit';
 
+  static const profileOwner = '/profile/owner';
+  static const editOwnerProfile = '/profile/owner/edit';
+  static const clubStaff = '/clubs/staff';
+
   static const knowledgeBase = '/kb';
   static const pdfReader = '/kb/pdf';
 }
