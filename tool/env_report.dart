@@ -1,10 +1,44 @@
+import 'dart:convert';
 import 'dart:io';
 
 Future<String> runCmd(List<String> cmd, {String? cwd}) async {
-  var pr = await Process.run(cmd.first, cmd.sublist(1), workingDirectory: cwd, runInShell: true);
-  var out = (pr.stdout ?? '').toString();
-  var err = (pr.stderr ?? '').toString();
-  return [out, err].where((s) => s.trim().isNotEmpty).join('\n');
+  ProcessResult pr;
+  if (Platform.isWindows) {
+    final joined = cmd.map((a) => a.contains(' ') ? '"$a"' : a).join(' ');
+    pr = await Process.run(
+      'cmd',
+      ['/c', 'chcp 65001>nul & $joined'],
+      workingDirectory: cwd,
+      stdoutEncoding: null,
+      stderrEncoding: null,
+      runInShell: false,
+    );
+  } else {
+    pr = await Process.run(
+      cmd.first,
+      cmd.sublist(1),
+      workingDirectory: cwd,
+      stdoutEncoding: null,
+      stderrEncoding: null,
+      runInShell: true,
+    );
+  }
+  final bytes = <int>[];
+  if (pr.stdout is List<int>) bytes.addAll(pr.stdout as List<int>);
+  if (pr.stderr is List<int>) bytes.addAll(pr.stderr as List<int>);
+  return decodeBest(bytes);
+}
+
+String decodeBest(List<int> b) {
+  try {
+    return utf8.decode(b);
+  } catch (_) {
+    try {
+      return systemEncoding.decode(b);
+    } catch (_) {
+      return utf8.decode(b, allowMalformed: true);
+    }
+  }
 }
 
 String ts() {
@@ -15,19 +49,38 @@ String ts() {
 
 String readIfExists(String path) {
   final f = File(path);
-  if (f.existsSync()) return f.readAsStringSync();
-  return '';
+  if (!f.existsSync()) return '';
+  try {
+    return f.readAsStringSync(encoding: utf8);
+  } catch (_) {
+    try {
+      return f.readAsStringSync(encoding: systemEncoding);
+    } catch (_) {
+      return f.readAsStringSync();
+    }
+  }
 }
 
 List<String> findLines(String path, RegExp re) {
   final f = File(path);
   if (!f.existsSync()) return [];
-  return f.readAsLinesSync().where((l) => re.hasMatch(l)).toList();
+  late List<String> lines;
+  try {
+    lines = f.readAsLinesSync(encoding: utf8);
+  } catch (_) {
+    try {
+      lines = f.readAsLinesSync(encoding: systemEncoding);
+    } catch (_) {
+      lines = f.readAsLinesSync();
+    }
+  }
+  return lines.where((l) => re.hasMatch(l)).toList();
 }
 
 Future<void> main() async {
   final outPath = 'env_report_${ts()}.md';
-  final sink = File(outPath).openWrite();
+  final sink = File(outPath).openWrite(encoding: utf8);
+  sink.write('\uFEFF');
 
   sink.writeln('# Flutter');
   sink.writeln(await runCmd(['flutter', '--version']));
@@ -50,14 +103,10 @@ Future<void> main() async {
   if (androidDir.existsSync()) {
     final gradlew = Platform.isWindows ? 'gradlew.bat' : './gradlew';
     sink.writeln(await runCmd([gradlew, '-v'], cwd: 'android'));
-
     sink.writeln('## gradle-wrapper.properties');
     sink.writeln(readIfExists('android/gradle/wrapper/gradle-wrapper.properties'));
-
     sink.writeln('## local.properties');
-    final lp = readIfExists('android/local.properties');
-    sink.writeln(lp.isEmpty ? '' : lp);
-
+    sink.writeln(readIfExists('android/local.properties'));
     sink.writeln('## SDK numbers');
     final re = RegExp(r'(compileSdk|targetSdk|minSdk|ndkVersion)');
     final candidates = [
@@ -78,9 +127,7 @@ Future<void> main() async {
   sink.writeln('# sdkmanager --list (top)');
   try {
     final list = await runCmd(['sdkmanager', '--list']);
-    final lines = list.split('\n');
-    final top = lines.take(200).join('\n');
-    sink.writeln(top);
+    sink.writeln(list.split('\n').take(200).join('\n'));
   } catch (_) {}
 
   await sink.flush();
